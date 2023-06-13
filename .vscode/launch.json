@@ -1,0 +1,145 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Main Process",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            "program": "${workspaceRoot}/main.js",
+            "runtimeArgs": [
+                // ".",
+                "--", 
+                "--trace-warnings",
+                // this args for attaching render process
+                "--remote-debugging-port=9222",
+                "--simple=1",
+                "--devtools=1",
+                "--debug=1",
+                // "--width=720",
+            ],
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+            },
+            "protocol": "inspector",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "NODE_DEBUG": "wav"
+            }
+        },
+        // {
+        //     "name": "Electron: App",
+        //     "program": "${workspaceFolder}/main.js",
+        //     "request": "launch",
+        //     "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+        //     "skipFiles": [
+        //         "<node_internals>/**"
+        //     ],
+        //     "type": "pwa-node"
+        // },
+        {
+            "name": "Train",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/train.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--workers",
+                "0",
+                "--batch_size",
+                "8",
+                "--reduced_dataset",
+                "2",
+                // "--learning_rate",
+                // "1e-4",
+                // "--epochs",
+                // "inf"
+            ]
+        },
+        {
+            "name": "Get cameras",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/rs/fetch_cameras.py",
+            "console": "integratedTerminal",
+            "args": []
+        },
+        {
+            "name": "Prepare Data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/prepare_data.py",
+            "console": "integratedTerminal",
+            "args": []
+        },
+        // {
+        //     "name": "Camera Test",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "${workspaceFolder}/cam_test.py",
+        //     "console": "integratedTerminal",
+        //     "args": [
+        //         "--checkpoint",
+        //         "1612161688",
+        //         "--checkpoint_type",
+        //         "model_best_test",
+        //         "--load_optimizer",
+        //         "f",
+        //         "--mixed_precision",
+        //         "f"
+        //     ],
+        //     // "justMyCode": false
+        // },
+        // {
+        //     "name": "App",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "program": "${workspaceFolder}/app.py",
+        //     "console": "integratedTerminal",
+        //     "args": [
+        //         // "--checkpoint",
+        //         // "1612541311",
+        //         // "--checkpoint_type",
+        //         // "model_best_test"
+        //     ]
+        // },
+        {
+            "name": "Copy Files",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/copy_files.py",
+            "console": "integratedTerminal",
+            "args": []
+        },
+        {
+            "name": "Compile",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/executable/SitYEA/compile.py",
+            "console": "integratedTerminal",
+            "args": [
+                "build"
+            ]
+        },
+        {
+            "name": "Python: Notification",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/module_notify.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--appid",
+                "SitYEA",
+                "--icon",
+                "ico.ico",
+                "--title",
+                "Some title",
+                "--message",
+                "Some description"
+            ]
+        }
+    ]
+}

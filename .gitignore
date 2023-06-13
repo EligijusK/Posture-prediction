@@ -1,0 +1,27 @@
+outputs/
+*output_models*/
+__pycache__
+sparseconv/
+*.pyc
+*.bag
+settings.ini
+executable/
+network/modules/sampling/sampling.egg-info/
+network/modules/sampling/build/
+network/modules/sampling/dist/
+executable.zip
+build/
+.key
+error.log
+history.npy
+node_modules/
+*.sock
+.settings
+.calibration
+.configs
+.history
+.access
+# SitYEA-*
+model_full
+model_simple
+console.log

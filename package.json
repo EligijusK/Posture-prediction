@@ -1,0 +1,50 @@
+{
+    "name": "torch-posture-prediction",
+    "version": "0.4.9",
+    "main": "main.js",
+    "private": "true",
+    "scripts": {
+        "start": "electron .",
+        "build-electron": "electron-packager . SitYEA --out=executable/SitYEA --overwrite --prune=true --platform=linux --arch=x64 --icon='ico.ico' --ignore='^((?!(node_modules|images/|eapp|package|\\.(js|css|html)$)).)+$'",
+        "rebuild-mmap": "electron-rebuild ./node_modules/@raygun-nickj/mmap-io/",
+        "rebuild-speaker": "electron-rebuild ./node_modules/speaker/",
+        "remote-win": "rdesktop -u audryzas@hotmail.com 192.168.1.241:3389 -g 1920x1080",
+        "build": "rm -rf build/ && python compile.py build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://KulikajevasA@bitbucket.org/KulikajevasA/torch-posture-prediction.git"
+    },
+    "keywords": [],
+    "author": "Audrius 'Ratchet' Kulikajevas",
+    "license": "UNLICENSED",
+    "homepage": "https://bitbucket.org/KulikajevasA/torch-posture-prediction#readme",
+    "description": "",
+    "dependencies": {
+        "@raygun-nickj/mmap-io": "^1.2.3",
+        "argparse": "^2.0.1",
+        "node-gyp": "^9.3.1",
+        "node-pre-gyp": "^0.17.0",
+        "nodemailer": "^6.6.3",
+        "open": "^8.3.0",
+        "socket.io": "^4.1.3",
+        "speaker": "^0.5.3",
+        "stream-to-array": "^2.3.0",
+        "wav": "^1.0.2",
+        "yauzl": "^2.10.0"
+    },
+    "devDependencies": {
+        "@electron/rebuild": "^3.2.13",
+        "electron": "^23.1.4",
+        "electron-builder": "^23.6.0",
+        "electron-packager": "^16.0.0",
+        "electron-reloader": "^1.2.1",
+        "node-abi": "3.40.0",
+        "terser": "^5.9.0"
+    },
+    "overrides": {
+        "electron-rebuild": {
+            "node-abi": "3.40.0"
+        }
+    }
+}

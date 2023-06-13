@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/home/envs/tensorflow/bin/python",
+    "terminal.integrated.env.linux": {
+        // "DISPLAY": "localhost:11.0"
+    }
+}

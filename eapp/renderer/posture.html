@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SitYEA</title>
+    <link rel="stylesheet" href="montserrat/montserrat.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preload" as="image" href="../../images/dashboard.png" as="image" />
+    <link rel="preload" as="image" href="../../images/calibrate_2d.png" as="image" />
+    <link rel="preload" as="image" href="../../images/calibrate_3d.png" as="image" />
+    <link rel="preload" as="image" href="../../images/exercises.png" as="image" />
+    <link rel="preload" as="image" href="../../images/workspace.png" as="image" />
+    <link rel="preload" as="image" href="../../images/about.png" as="image" />
+    <link rel="preload" as="image" href="../../images/mode.png" as="image" />
+    <link rel="preload" as="image" href="../../images/cam_rs.png" as="image" />
+    <link rel="preload" as="image" href="../../images/cam_web.png" as="image" />
+    <link rel="preload" as="image" href="../../images/calib_init_2d.png" as="image" />
+    <link rel="preload" as="image" href="../../images/calib_init_3d.png" as="image" />
+    <link rel="preload" as="image" href="../../images/no_camera.png" as="image" />
+</head>
+
+<body view="dashboard" is-loading="true" has-dev="null">
+    <div class="background"></div>
+    <div view-in="calibrate" class="fullscreen-container">
+        <div id="canvas-container" class="canvas-container fullscreen-container"></div>
+        <div class="camera-container">
+            <div class="cam-list">
+                <select id="camera-list" data-action="camera:select">
+                    <option disabled selected value="-1">None</option>
+                </select>
+            </div>
+        </div>
+        <div class="button finish-initial" data-action="camera:calibrated"></div>
+        <div class="posture-container">
+            <div class="label">Current posture status:</div>
+            <div class="posture" data-listen="truePosture" data-posture="good">--</div>
+        </div>
+        <div class="calibration-speed-container">
+            <span class="label">Calibration Speed</span>
+            <label class="switch calibration-speed">
+                <input type="checkbox" checked config-toggle="calibrationSpeed">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div class="button tooltip-show posture-list">
+            <div id="posture-list" class="tooltip">Information</div>
+        </div>
+        <div class="button to-dashboard" data-action="view:dashboard"></div>
+    </div>
+    <div view-in="dashboard" class="statistics-container fullscreen-container">
+        <div id="statistics-hourly" class="statistics hourly"></div>
+        <div id="statistics-totals" class="statistics totals"></div>
+    </div>
+    <div view-in="exercises" class="fullscreen-container">
+        <div class="exercises-container" iframe="https://sityea.io/exercises/"></div>
+    </div>
+    <div view-in="workspace" class="fullscreen-container">
+        <div class="workspace-container" iframe="https://sityea.io/workplace-setup/"></div>
+    </div>
+    <div view-in="mode" class="fullscreen-container">
+        <form data-form="select-camera">
+            <div class="camera webcam selected">
+                <label>
+                    <div class="cam-bg button">
+                        <input checked class="cam-input" type="radio" name="cam-type" value="0" />
+                    </div>
+                    <div class="cam-img fullscreen-container"></div>
+                </label>
+            </div>
+            <div class="camera realsense">
+                <label>
+                    <div class="button cam-bg">
+                        <input class="cam-input" type="radio" name="cam-type" value="1" />
+                    </div>
+                    <div class="cam-img fullscreen-container"></div>
+
+                </label>
+            </div>
+            <input class="select-camera-submit button" value="" type="submit" />
+            <div class="button order-camera" data-action="navigate:order_rs"></div>
+        </form>
+    </div>
+    <div view-in="about" class="fullscreen-container">
+        <div class="version-number">Version: <span data-static="app_ver">#version</span></div>
+        <div class="button open-homepage" data-action="navigate:sityea"></div>
+        <div class="button open-privacy" data-action="navigate:privacy"></div>
+        <div class="button open-terms" data-action="navigate:terms"></div>
+        <div class="button open-console-log" data-action="open:console.log"></div>
+        <div class="about-container">
+            <form data-form="send-mail">
+                <textarea name="mail-contents" class="mail-contents"
+                    placeholder="What do you think of SiytYEA?"></textarea>
+                <input class="mail-submit button" value="" type="submit" />
+            </form>
+        </div>
+        <label class="switch-container  send-logs">
+            <input type="checkbox" config-toggle="sendLogs">
+            <span class="label-switch">
+                <span class="label"></span>
+                <span class="switch">
+                    <span class="slider round"></span>
+                </span>
+            </span>
+    </div>
+    <div view-in="dashboard" class="settings-container fullscreen-container">
+        <label class="switch minimize-tray">
+            <input type="checkbox" checked config-toggle="minimizeTray">
+            <span class="slider round"></span>
+        </label>
+        <div class="button tooltip-show measure-every">
+            <div class="tooltip">
+                Higher value might produce less accurate results but provide better granularity.
+            </div>
+        </div>
+
+        <div class="button tooltip-show prediction-frames">
+            <div class="tooltip">
+                Faster speed will measure your posture more frequently at expense of an increased CPU load
+            </div>
+        </div>
+
+        <select config-key="model.predictionFrames">
+            <option value="1">High</option>
+            <option value="5" selected>Medium</option>
+            <option value="10">Low</option>
+        </select>
+        <input config-type="number" config-multiplier="1000" config-key="measureEvery" type="number" value="1" min="1"
+            max="999" maxlength="3" />
+        <input config-type="number" config-multiplier="60000" config-key="takeBreak.time" type="number" value="1"
+            min="1" max="999" maxlength="3" />
+        <input config-type="number" config-multiplier="60000" config-key="badPosture.time" type="number" value="1"
+            min="1" max="999" maxlength="3" />
+        <div data-action="reset:history" class="button reset-history"></div>
+
+        <label class="switch-container sound_take-break">
+            <input type="checkbox" config-toggle="takeBreak.sound">
+            <span class="label-switch">
+                <span class="label"></span>
+                <span class="switch">
+                    <span class="slider round"></span>
+                </span>
+            </span>
+        </label>
+
+        <label class="switch-container toast_take-break">
+            <input type="checkbox" config-toggle="takeBreak.toast">
+            <span class="label-switch">
+                <span class="label"></span>
+                <span class="switch">
+                    <span class="slider round"></span>
+                </span>
+            </span>
+        </label>
+
+        <label class="switch-container sound_bad-posture">
+            <input type="checkbox" config-toggle="badPosture.sound">
+            <span class="label-switch">
+                <span class="label"></span>
+                <span class="switch">
+                    <span class="slider round"></span>
+                </span>
+            </span>
+        </label>
+
+        <label class="switch-container toast_bad-posture">
+            <input type="checkbox" config-toggle="badPosture.toast">
+            <span class="label-switch">
+                <span class="label"></span>
+                <span class="switch">
+                    <span class="slider round"></span>
+                </span>
+            </span>
+        </label>
+
+        <div data-action="add-value:takeBreak.time" class="button take-break-add"></div>
+        <div data-action="sub-value:takeBreak.time" class="button take-break-sub"></div>
+        <div data-action="add-value:badPosture.time" class="button bad-posture-add"></div>
+        <div data-action="sub-value:badPosture.time" class="button bad-posture-sub"></div>
+    </div>
+    <div class="sidebar-container fullscreen-container">
+        <div data-action="view:dashboard" class="button dashboard"></div>
+        <div data-action="view:calibrate" class="button calibrate"></div>
+        <div data-action="view:exercises" class="button exercises"></div>
+        <div data-action="view:workspace" class="button workspace"></div>
+        <div data-action="view:about" class="button about"></div>
+        <div class="change-mode">
+            <select data-action="camera:type" config-key="useRealsense">
+                <option value="0">Integrated Camera (2D)</option>
+                <option value="1">Depth Camera (3D)</option>
+            </select>
+        </div>
+    </div>
+    <div class="centered loading-indicator fullscreen-container">
+        <div data-proc-state="proc_init">
+            <div class="title">SitYEA is loading...</div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="load-label">
+                <div data-proc="proc_first-run">Performing first run setup...</div>
+                <div data-proc="proc_init">Initializing system...</div>
+                <div data-proc="proc_ipc">Libraries loaded...</div>
+                <div data-proc="proc_cam">
+                    <div has-cam="true">Camera feed loaded...</div>
+                    <div has-cam="false">Camera not detected.</div>
+                </div>
+                <div data-proc="proc_net">AI engine loaded.</div>
+            </div>
+        </div>
+    </div>
+    <div class="disconnected-container centered fullscreen-container device-disconnected">
+        <div class="fullscreen-container">
+            <div data-action="camera:reset" class="reset-camera button"></div>
+        </div>
+    </div>
+    <div id="toast" class="toast hidden">Toast...</div>
+</body>
+
+<script type="application/javascript" src="./app.js"></script>
+
+</html>

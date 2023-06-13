@@ -1,0 +1,10 @@
+npm install
+
+npm cache --force clean
+
+node-gyp rebuild
+
+npx electron-rebuild ./node_modules/@raygun-nickj/mmap-io/
+
+npx electron-rebuild ./node_modules/speaker/
+
