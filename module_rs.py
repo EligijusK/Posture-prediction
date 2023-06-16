@@ -182,6 +182,7 @@ async def main():
     sock = socketio.AsyncClient()
 
     await sock.connect(str_sock)
+    await sock.wait()
 
     print("Socket connection established")
     sys.stdout.flush()
@@ -224,13 +225,13 @@ async def main():
                     sys.stdout.flush()
 
                     rs = ModuleWebcam(coms, camera_list[0]["camera_index"] if cam_idx < 0 else cam_idx, override_device)
-                    await sock.emit("ipc_rs_resp", {
-                        "ramPadding": rs.coms.hram_padding,
-                        "dims": {"width": WIDTH, "height": HEIGHT},
-                        "cameraList": camera_list,
-                        "depthScale": 1,
-                        "matrixK": [0] * 9
-                    })
+                    # await sock.emit("ipc_rs_resp", {
+                    #     "ramPadding": rs.coms.hram_padding,
+                    #     "dims": {"width": WIDTH, "height": HEIGHT},
+                    #     "cameraList": camera_list,
+                    #     "depthScale": 1,
+                    #     "matrixK": [0] * 9
+                    # })
                 else:
                     rs = ModuleRealsense(coms, override_device)
                     flat_K = np.reshape(rs.pipeline.matrix_K, [-1]).tolist()
@@ -243,6 +244,9 @@ async def main():
                     })
 
                 await sock.sleep(1)
+                print(camera_list)
+                sys.stdout.flush()
+
 
                 while True:
                     if rs is None:

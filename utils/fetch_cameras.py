@@ -5,7 +5,7 @@ import platform
 import subprocess
 
 if platform.system() == "Windows":
-    import winrt.windows.devices.enumeration as windows_devices
+    import winsdk.windows.devices.enumeration as windows_devices
 
 
 async def get_camera_information_for_windows():

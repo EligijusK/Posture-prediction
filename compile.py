@@ -18,7 +18,7 @@ sign_tool = "%s/signtool.exe" % dir_winsdk
 makeappx = "%s/makeappx.exe" % dir_winsdk
 cert_path = "./certificate.pfx"
 cert_pass = None
-archive_files, copy_files = True, True # last one was false
+archive_files, copy_files = False, True # last one was false
 build_version = load_json("package.json")["version"] + ".0"
 
 root_dir = os.path.realpath(os.path.dirname(__file__))
