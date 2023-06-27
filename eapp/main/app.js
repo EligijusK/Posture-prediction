@@ -18,6 +18,7 @@ const fsExists = promisify(fs.exists);
 const { unzipAssets, needsUnzip } = require("./unzip-assets");
 const { createWritableDirs, getSettingPath, getTrueSettingsPath } = require("./writable-path-utils");
 const appVersion = require("./app-version");
+const Console = require("console");
 
 const parser = new ArgumentParser({ description: "SitYEA arguments", add_help: true });
 parser.add_argument("--width", { default: 1440, type: "int", help: "Window size" });
@@ -144,6 +145,7 @@ async function initPostureEvaluator(win) {
         procReadyState = "proc_ipc";
 
         const manProc = new ProcessManager(win, manCfg);
+
         const ipcRS = await manProc.starRS({
             ipc: ipcPython,
             port: portPython,
@@ -151,6 +153,8 @@ async function initPostureEvaluator(win) {
             camera: manCfg.settings.camera,
             useSimple: isSimple
         });
+
+
 
         console.log("RS process initialized.");
 
@@ -178,8 +182,10 @@ async function initPostureEvaluator(win) {
         });
 
         const { ramPadding, dims: rsDims, depthScale, matrixK, cameraList } = await new Promise(resolve => {
+
             ipcRS.once("ipc_rs_resp", resolve);
             ipcRS.emit("ipc_rs");
+
         });
 
         console.log("Received RS metadata.");

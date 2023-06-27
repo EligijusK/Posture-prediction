@@ -49,6 +49,7 @@ class ProcessManager {
     }
 
     starRS({ ipc, port, pathRam, useSimple, camera }) {
+
         return new Promise(resolve => {
             ipc.on("connection", onConnect.bind(undefined, "rs", ipc, resolve));
 
@@ -77,14 +78,15 @@ class ProcessManager {
 module.exports = ProcessManager;
 
 function onConnect(connType, ipc, resolve, sock) {
+
     function onConnIPC({ type }) {
         if (type !== connType) return;
-
         ipc.removeListener("connection", onConnect);
         sock.removeListener("ipc_conn", onConnIPC);
-
         resolve(sock);
     }
 
     sock.on("ipc_conn", onConnIPC);
+
+
 }

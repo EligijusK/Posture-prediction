@@ -77,15 +77,18 @@ class BaseModuleCamera:
 class ModuleWebcam(BaseModuleCamera):
     def __init__(self, coms, device_index, override_device=None):
         print("override_device:", override_device, flush=True)
+
         if override_device is None:
             self.capture = cv2.VideoCapture(device_index)
+            print("Setup Video Capture Device", flush=True)
         else:
             print("use captured vide!!!!!!!!1", flush=True)
             self.capture = cv2.VideoCapture(override_device)
 
+
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
+        print("Video Configuration", flush=True)
         super().__init__(coms)
 
     def __del__(self):
@@ -182,7 +185,7 @@ async def main():
     sock = socketio.AsyncClient()
 
     await sock.connect(str_sock)
-    await sock.wait()
+    # await sock.wait()
 
     print("Socket connection established")
     sys.stdout.flush()
@@ -217,7 +220,8 @@ async def main():
                     print("Using simple model.")
                     sys.stdout.flush()
                     camera_list = await fetch_all_cameras()
-
+                    print("Using")
+                    sys.stdout.flush()
                     if len(camera_list) == 0:
                         raise NoDeviceException()
 
@@ -225,13 +229,15 @@ async def main():
                     sys.stdout.flush()
 
                     rs = ModuleWebcam(coms, camera_list[0]["camera_index"] if cam_idx < 0 else cam_idx, override_device)
-                    # await sock.emit("ipc_rs_resp", {
-                    #     "ramPadding": rs.coms.hram_padding,
-                    #     "dims": {"width": WIDTH, "height": HEIGHT},
-                    #     "cameraList": camera_list,
-                    #     "depthScale": 1,
-                    #     "matrixK": [0] * 9
-                    # })
+
+                    await sock.emit("ipc_rs_resp", {
+                        "ramPadding": rs.coms.hram_padding,
+                        "dims": {"width": WIDTH, "height": HEIGHT},
+                        "cameraList": camera_list,
+                        "depthScale": 1,
+                        "matrixK": [0] * 9
+                    })
+
                 else:
                     rs = ModuleRealsense(coms, override_device)
                     flat_K = np.reshape(rs.pipeline.matrix_K, [-1]).tolist()
@@ -243,12 +249,12 @@ async def main():
                         "matrixK": flat_K
                     })
 
-                await sock.sleep(1)
                 print(camera_list)
                 sys.stdout.flush()
 
-
                 while True:
+                    print("Work?")
+                    sys.stdout.flush()
                     if rs is None:
                         break
                     rs.queue_frame_data()
