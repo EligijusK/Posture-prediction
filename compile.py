@@ -6,6 +6,7 @@ import shutil
 import subprocess
 from tqdm import tqdm
 from glob import glob
+from glob import glob
 from utils.files import load_json
 from cx_Freeze import setup, Executable
 from itertools import chain as iterchain

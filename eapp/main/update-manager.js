@@ -80,6 +80,7 @@ class UpdateManager {
         this._updateCalibration(label, face);
 
         this._historyMan.save();
+
         this._win.sendMessage("historyUpdate", { hourly, totals });
 
         if (this._view === "calibrate") {

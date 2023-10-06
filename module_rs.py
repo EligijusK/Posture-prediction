@@ -2,17 +2,14 @@ import os
 import cv2
 import sys
 import mmap
-import time
 import struct
 import ctypes
 import asyncio
 import socketio
+import aiohttp
 import numpy as np
-import pyrealsense2 as rs
-from rs.pipeline import RSPipeLine
 from utils.fetch_string import fetch_string
 from utils.fetch_cameras import fetch_all_cameras
-from rs.config import create_config, create_playback_config
 from rs.exceptions import NoDeviceException, USB30Exception, DevInUseException
 
 WIDTH, HEIGHT = 640, 480
@@ -21,23 +18,24 @@ WIDTH, HEIGHT = 640, 480
 
 
 class ModuleComs:
-    def __init__(self, path_ram):
+    def __init__(self, path_ram, path_ram_2):
         self.hram_depth = None
         self.hram_rgba = None
         self.hfile = None
+        self.hfile2 = None
 
         SZ_DEPTH = WIDTH * HEIGHT * 1 * ctypes.sizeof(ctypes.c_float)
         SZ_RGB = WIDTH * HEIGHT * 4 * ctypes.sizeof(ctypes.c_uint8)
         SZ_OFFSET = mmap.ALLOCATIONGRANULARITY - SZ_DEPTH % mmap.ALLOCATIONGRANULARITY
 
-        print("OS requires offset offset of '%i' bytes" % SZ_OFFSET)
-        sys.stdout.flush()
-
         # initialize socket
-        with open(path_ram, "wb") as f:
+        with open(path_ram, "wb") as f: # path_ram  FAILS TO WRITE TO PATH_RAM  /Users/eligijus/.sock
             f.write(np.zeros([HEIGHT, WIDTH], dtype=np.float32))
             f.write(b"\x00" * SZ_OFFSET)  # padding for wangblows
-            f.write(np.full([HEIGHT, WIDTH, 4], 255, dtype=np.uint8))
+            # f.write(np.full([HEIGHT, WIDTH, 4], 255, dtype=np.uint8))
+
+        with open(path_ram_2, "wb") as f2:
+            f2.write(np.full([HEIGHT, WIDTH, 4], 255, dtype=np.uint8))
 
         print("SZ_DEPTH: %i" % SZ_DEPTH)
         print("SZ_RGB: %i" % SZ_RGB)
@@ -45,22 +43,25 @@ class ModuleComs:
         print("SZ_TOTAL: %i" % (SZ_DEPTH + SZ_RGB + SZ_OFFSET))
         sys.stdout.flush()
 
-        self.hfile = open(path_ram, "r+b")
+        self.hfile = open(path_ram, "r+b") # path_ram /Users/eligijus/.sock
+        self.hfile2 = open(path_ram_2, "r+b")  # path_ram /Users/eligijus/.sock
         self.hram_depth = mmap.mmap(
             self.hfile.fileno(), offset=0, length=SZ_DEPTH, access=mmap.ACCESS_WRITE)
         self.hram_rgba = mmap.mmap(
-            self.hfile.fileno(), offset=SZ_DEPTH + SZ_OFFSET, length=SZ_RGB, access=mmap.ACCESS_WRITE)
+            self.hfile2.fileno(), offset=0, length=SZ_RGB, access=mmap.ACCESS_WRITE)
         self.hram_padding = SZ_OFFSET
 
     def __del__(self):
-        print("Cleanup the files.")
+        # print("Cleanup the files.")
         if self.hram_depth is not None:
             self.hram_depth.close()
         if self.hram_rgba is not None:
             self.hram_rgba.close()
         if self.hfile is not None:
             self.hfile.close()
-            print("File closed.")
+        if self.hfile2 is not None:
+            self.hfile2.close()
+            # print("File closed.")
 
 
 class BaseModuleCamera:
@@ -76,19 +77,20 @@ class BaseModuleCamera:
 
 class ModuleWebcam(BaseModuleCamera):
     def __init__(self, coms, device_index, override_device=None):
-        print("override_device:", override_device, flush=True)
+        # print("override_device:", override_device, flush=True)
 
         if override_device is None:
+            # print(device_index)
             self.capture = cv2.VideoCapture(device_index)
-            print("Setup Video Capture Device", flush=True)
+            # print("Setup Video Capture Device", flush=True)
         else:
-            print("use captured vide!!!!!!!!1", flush=True)
+            # print("use captured vide!!!!!!!!1", flush=True)
             self.capture = cv2.VideoCapture(override_device)
 
 
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-        print("Video Configuration", flush=True)
+        # print("Video Configuration", flush=True)
         super().__init__(coms)
 
     def __del__(self):
@@ -104,60 +106,6 @@ class ModuleWebcam(BaseModuleCamera):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         self.frame_rgba[..., 0:3] = frame
-
-
-class ModuleRealsense(BaseModuleCamera):
-    def __init__(self, coms, override_device):
-        self.pipeline, self.align = \
-            self.init_realsense(override_device)
-        super().__init__(coms)
-
-    def __del__(self):
-        self.pipeline.stop()
-
-    def reset_realsense(self):
-        self.pipeline.profile.get_device().hardware_reset()
-        self.pipeline.stop()
-        self.pipeline, self.align, (self.shared_buffer, self.input_frame) = self.__init_realsense(self.override_device) \
-            if self.enable_rs \
-            else (None, None, (None, None))
-
-    def init_realsense(self, override_device=None):
-        context = rs.context()
-        devices = context.query_devices()
-
-        print("Device count: %i" % len(devices))
-        sys.stdout.flush()
-
-        if len(devices) == 0 and override_device is None:
-            raise NoDeviceException()
-
-        pipeline = RSPipeLine(
-            devices[0]
-            if override_device is None
-            else override_device
-        )
-
-        align_to = rs.stream.color
-        align = rs.align(align_to)
-
-        pipeline.start()
-
-        return pipeline, align
-
-    def queue_frame_data(self):
-        pipeline, align = self.pipeline, self.align
-        depth_scale = pipeline.depth_scale if pipeline is not None else 1
-
-        frame = pipeline.wait_for_frames()
-        frame = align.process(frame)
-
-        color, depth = frame.get_color_frame(), frame.get_depth_frame()
-        data_color = np.array(color.get_data(), dtype=np.uint8)
-        data_depth = np.array(depth.get_data(), dtype=np.float32)
-
-        self.frame_depth[...] = data_depth
-        self.frame_rgba[..., 0:3] = data_color
 
 
 async def main():
@@ -177,22 +125,24 @@ async def main():
         use_simple = not override_device.endswith(".bag")
 
     path_ram = fetch_string(sys.stdin.buffer)
-
-    print("Path RAM: '%s'" % path_ram)
-    print("Socket string: '%s'" % str_sock)
-    sys.stdout.flush()
+    path_ram = path_ram.split(',')
+    # print(path_ram[0])
+    # print(path_ram[1])
+    # path_ram = "/Users/eligijus/Desktop/Projektai/Posture-prediction/.sock"
+    # print("Path RAM: '%s'" % path_ram)
+    # print("Socket string: '%s'" % str_sock)
+    # sys.stdout.flush()
 
     sock = socketio.AsyncClient()
 
     await sock.connect(str_sock)
-    # await sock.wait()
 
     print("Socket connection established")
     sys.stdout.flush()
 
     await sock.emit("ipc_conn", {"type": "rs"})
 
-    coms = ModuleComs(path_ram)
+    coms = ModuleComs(path_ram[0], path_ram[1])
 
     @sock.event
     async def disconnect(): sys.exit(0)
@@ -200,7 +150,7 @@ async def main():
     @sock.on("ipc_rs_cam")
     async def on_ipc_rs_cam(index):
         nonlocal rs
-        print("Changing the camera to: %i" % index)
+        # print("Changing the camera to: %i" % index)
         cam_idx = index
         if rs is not None:
             del rs
@@ -213,22 +163,27 @@ async def main():
     async def on_ipc_rs():
         nonlocal rs
         global override_device
-        sys.stdout.flush()
+        # sys.stdout.flush()
         while True:
             try:
                 if use_simple:
-                    print("Using simple model.")
-                    sys.stdout.flush()
+                    # print("Using simple model.")
+                    # sys.stdout.flush()
                     camera_list = await fetch_all_cameras()
-                    print("Using")
-                    sys.stdout.flush()
+
+                    # print("Using")
+                    # sys.stdout.flush()
+
                     if len(camera_list) == 0:
                         raise NoDeviceException()
 
-                    print(camera_list)
-                    sys.stdout.flush()
+                    # print(camera_list)
+                    # sys.stdout.flush()
 
                     rs = ModuleWebcam(coms, camera_list[0]["camera_index"] if cam_idx < 0 else cam_idx, override_device)
+
+                    # print("Opened?")
+                    # sys.stdout.flush()
 
                     await sock.emit("ipc_rs_resp", {
                         "ramPadding": rs.coms.hram_padding,
@@ -237,24 +192,14 @@ async def main():
                         "depthScale": 1,
                         "matrixK": [0] * 9
                     })
-
-                else:
-                    rs = ModuleRealsense(coms, override_device)
-                    flat_K = np.reshape(rs.pipeline.matrix_K, [-1]).tolist()
-
-                    await sock.emit("ipc_rs_resp", {
-                        "ramPadding": rs.coms.hram_padding,
-                        "dims": {"width": WIDTH, "height": HEIGHT},
-                        "depthScale": rs.pipeline.depth_scale,
-                        "matrixK": flat_K
-                    })
-
-                print(camera_list)
-                sys.stdout.flush()
+                # print(camera_list)
+                # sys.stdout.flush()
 
                 while True:
-                    print("Work?")
-                    sys.stdout.flush()
+
+                    # print("Work?")
+                    # sys.stdout.flush()
+
                     if rs is None:
                         break
                     rs.queue_frame_data()

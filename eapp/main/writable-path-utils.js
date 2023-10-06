@@ -1,10 +1,24 @@
 const _path = require("path");
+const app = require("electron");
+
 const IS_WINDOWS_APPS = /\\WindowsApps/.test(__dirname);
 
 function getSettingPath(path = "") {
     return IS_WINDOWS_APPS && process.env.APPDATA
         ? _path.resolve(`${process.env.APPDATA}/SitYEA/${path}`)
         : _path.resolve(path);
+}
+
+function getMacPathModules(path = "") {
+    realPath = app.app.getAppPath();
+    array = realPath.split('/')
+    array = array.slice(0, array.length - 2);
+    resultPath = array.join('/')
+    return resultPath + "/" + path;
+}
+
+function getSettingPathMac(path = ""){
+    return app.app.getAppPath() + "/" + path;
 }
 
 function getTrueSettingsPath(path = "") {
@@ -37,7 +51,9 @@ async function createWritableDirs() {
 
 module.exports = {
     IS_WINDOWS_APPS,
+    getMacPathModules,
     getSettingPath,
+    getSettingPathMac,
     createWritableDirs,
     getTrueSettingsPath
 };

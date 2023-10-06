@@ -59,29 +59,30 @@
     <div view-in="workspace" class="fullscreen-container">
         <div class="workspace-container" iframe="https://sityea.io/workplace-setup/"></div>
     </div>
-    <div view-in="mode" class="fullscreen-container">
-        <form data-form="select-camera">
-            <div class="camera webcam selected">
-                <label>
-                    <div class="cam-bg button">
-                        <input checked class="cam-input" type="radio" name="cam-type" value="0" />
-                    </div>
-                    <div class="cam-img fullscreen-container"></div>
-                </label>
-            </div>
-            <div class="camera realsense">
-                <label>
-                    <div class="button cam-bg">
-                        <input class="cam-input" type="radio" name="cam-type" value="1" />
-                    </div>
-                    <div class="cam-img fullscreen-container"></div>
+<!--    <div view-in="mode" class="fullscreen-container">-->
+<!--        <form data-form="select-camera">-->
+<!--            <div class="camera webcam selected">-->
+<!--                <label>-->
+<!--                    <div class="cam-bg button">-->
+<!--                        <input checked class="cam-input" type="radio" name="cam-type" value="0" />-->
+<!--                    </div>-->
+<!--                    <div class="cam-img fullscreen-container"></div>-->
+<!--                </label>-->
+<!--            </div>-->
+<!--            delete realsense-->
+<!--            <div class="camera realsense">-->
+<!--                <label>-->
+<!--                    <div class="button cam-bg">-->
+<!--                        <input class="cam-input" type="radio" name="cam-type" value="1" />-->
+<!--                    </div>-->
+<!--                    <div class="cam-img fullscreen-container"></div>-->
 
-                </label>
-            </div>
-            <input class="select-camera-submit button" value="" type="submit" />
-            <div class="button order-camera" data-action="navigate:order_rs"></div>
-        </form>
-    </div>
+<!--                </label>-->
+<!--            </div>-->
+<!--            <input class="select-camera-submit button" value="" type="submit" />-->
+<!--            <div class="button order-camera" data-action="navigate:order_rs"></div>-->
+<!--        </form>-->
+<!--    </div>-->
     <div view-in="about" class="fullscreen-container">
         <div class="version-number">Version: <span data-static="app_ver">#version</span></div>
         <div class="button open-homepage" data-action="navigate:sityea"></div>
@@ -185,12 +186,12 @@
         <div data-action="view:exercises" class="button exercises"></div>
         <div data-action="view:workspace" class="button workspace"></div>
         <div data-action="view:about" class="button about"></div>
-        <div class="change-mode">
-            <select data-action="camera:type" config-key="useRealsense">
-                <option value="0">Integrated Camera (2D)</option>
-                <option value="1">Depth Camera (3D)</option>
-            </select>
-        </div>
+<!--        <div class="change-mode">-->
+<!--            <select data-action="camera:type" config-key="useRealsense">-->
+<!--                <option value="0">Integrated Camera (2D)</option>-->
+<!--                <option value="1">Depth Camera (3D)</option>-->
+<!--            </select>-->
+<!--        </div>-->
     </div>
     <div class="centered loading-indicator fullscreen-container">
         <div data-proc-state="proc_init">

@@ -1,10 +1,12 @@
 const process = require("process");
-const { app, ipcMain, BrowserWindow, Tray, Menu } = require("electron");
+const { app, ipcMain, BrowserWindow, Tray, Menu, nativeImage } = require("electron");
 const getAssetPath = require("./get-asset-path");
+let trayIsOpen = false;
 
 class AppWindow {
     constructor({ width, height }) {
         const icon = getAssetPath("./images/ico.png");
+        const trayIcon = getAssetPath('./images/trayIco.png');
         const win = this._win = new BrowserWindow({
             width,
             height,
@@ -20,7 +22,6 @@ class AppWindow {
         });
 
         win.setSize(width, height);
-        // console.log(`New size @23 ${width}x${height}`);
 
         let frameSize = { width: 0, height: 0 };
 
@@ -53,9 +54,14 @@ class AppWindow {
                 { label: "Quit", click: function () { win.close(); } }
             ]);
 
-            this._tray = new Tray(icon);
-            this._tray.setContextMenu(context);
-            this._tray.on("double-click", fnShow);
+
+            if(!trayIsOpen) {
+                this._tray = new Tray(trayIcon);
+                console.log(this.trayIsOpen)
+                this._tray.setContextMenu(context);
+                this._tray.on("double-click", fnShow);
+            }
+            trayIsOpen = true;
         });
     }
 

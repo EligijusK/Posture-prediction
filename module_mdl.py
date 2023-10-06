@@ -1,5 +1,5 @@
 import os
-import imp
+from importlib.machinery import SourceFileLoader
 import sys
 import mmap
 import time
@@ -9,7 +9,6 @@ import asyncio
 import socketio
 import numpy as np
 import mediapipe as mpipe
-import utils.math as mathutils
 from collections import Counter
 import utils.mediapipe as mputils
 from utils.skeleton import Skeleton
@@ -17,9 +16,12 @@ from utils.get_asset import get_asset_path
 from utils.fetch_string import fetch_string
 from data.label_manager import LabelManager
 from torch import cuda, tensor as create_tensor
-from utils.image_to_points import image_to_points
 
-PATH_TAXONOMY = get_asset_path("data/label_hierarchy.json")
+# Other
+# PATH_TAXONOMY = get_asset_path("data/label_hierarchy.json")
+
+# Mac OS Build
+PATH_TAXONOMY = get_asset_path("../Resources/data/label_hierarchy.json")
 
 mp_drawing = mpipe.solutions.drawing_utils
 mp_face = mpipe.solutions.face_detection
@@ -37,7 +39,7 @@ def mode(arr):
 
 
 class ModulePred:
-    def __init__(self, *, use_gpu, use_simple, ram_padding, path_ram, man_labels, width, height,
+    def __init__(self, *, use_gpu, use_simple, ram_padding, path_ram, path_ram_2, man_labels, width, height,
                  depth_scale, matrix_K, path_model, path_checkpoint, depth_max, max_frames):
 
         SZ_DEPTH = width * height * 1 * ctypes.sizeof(ctypes.c_float)
@@ -52,55 +54,53 @@ class ModulePred:
         self.max_frames = max_frames
         self.use_simple = use_simple
 
-        if not use_simple:
-            print("Loading model...")
-            sys.stdout.flush()
-            self.network = self.load_model(
-                use_gpu, len(man_labels.get_shape()),
-                path_model, path_checkpoint
-            )
-            self.facer = mp_face.FaceDetection(min_detection_confidence=0.5)
-        else:
-            print("Loading model...")
-            sys.stdout.flush()
-            self.network = self.load_model(
-                use_gpu, len(man_labels.get_shape()),
-                path_model, path_checkpoint
-            )
-            print("Using mediapipe predictions.")
-            self.poser = mp_pose.Pose(min_detection_confidence=0.7)
-            self.skeleton = Skeleton()
+        # print(path_model)
+        # sys.stdout.flush()
 
-            def create_gaussian_kernel(size, sigma):
-                mean = size * 0.5
+        self.network = self.load_model(
+            use_gpu, len(man_labels.get_shape()),
+            path_model, path_checkpoint
+        )
 
-                def gaussian_formula(x):
-                    return np.exp(-0.5 * (np.power((x - mean) / sigma, 2.0))) \
-                        / (2 * np.pi * sigma * sigma)
+        # print("Using mediapipe predictions.")
+        # sys.stdout.flush()
 
-                kernel = np.array([gaussian_formula(x) for x in range(size)])
+        self.poser = mp_pose.Pose(min_detection_confidence=0.7)
+        self.skeleton = Skeleton()
 
-                return np.reshape(kernel / np.sum(kernel), [size, 1, 1])
+        def create_gaussian_kernel(size, sigma):
+            mean = size * 0.5
 
-            self.kernel = create_gaussian_kernel(self.max_frames, 1)
-            self.skeleton_history = np.zeros([self.max_frames, 33, 3])
-            self.first_frame = False
+            def gaussian_formula(x):
+                return np.exp(-0.5 * (np.power((x - mean) / sigma, 2.0))) \
+                       / (2 * np.pi * sigma * sigma)
 
-        print("Opening RAM file...")
-        sys.stdout.flush()
+            kernel = np.array([gaussian_formula(x) for x in range(size)])
+
+            return np.reshape(kernel / np.sum(kernel), [size, 1, 1])
+
+        self.kernel = create_gaussian_kernel(self.max_frames, 1)
+        self.skeleton_history = np.zeros([self.max_frames, 33, 3])
+        self.first_frame = False
+
+        # print("Opening RAM file...")
+        # sys.stdout.flush()
 
         self.hfile = open(path_ram, "r")
+        self.hfile_2 = open(path_ram_2, "r")
 
-        print("RAM open. Remapping...")
+
+        print("RAM open. Remapping... %s", self.hfile_2.fileno())
+        print("RAM open. Remapping... %s", self.hfile.fileno())
         sys.stdout.flush()
 
         self.hram_depth = mmap.mmap(
             self.hfile.fileno(), offset=0, length=SZ_DEPTH, access=mmap.ACCESS_READ)
         self.hram_rgba = mmap.mmap(
-            self.hfile.fileno(), offset=SZ_DEPTH + ram_padding, length=SZ_RGB, access=mmap.ACCESS_READ)
+            self.hfile_2.fileno(), offset=0, length=SZ_RGB, access=mmap.ACCESS_READ)
 
-        print("RAM remapped.")
-        sys.stdout.flush()
+        # print("RAM remapped.")
+        # sys.stdout.flush()
 
         self.frame_depth = np.reshape(np.frombuffer(
             self.hram_depth, dtype=np.float32), [height, width])
@@ -110,8 +110,8 @@ class ModulePred:
         self.placeholder = np.empty([height, width, 4], dtype=np.float32)
         self.last_frames = ["empty"]
 
-        print("Model is initialized.")
-        sys.stdout.flush()
+        # print("Model is initialized.")
+        # sys.stdout.flush()
 
     def load_model(self, use_gpu, label_count, path_model, path_checkpoint):
         try:
@@ -124,22 +124,20 @@ class ModulePred:
         except:
             device = "cpu"
 
-        print("Use device for network: %s" % device)
-        sys.stdout.flush()
+        # print("Use device for network: %s" % device)
+        # sys.stdout.flush()
 
         if not getattr(sys, "frozen", False):
             py_path = "%s/__init__.py" % path_model
             pyc_path = "%s/__init__.pyc" % path_model
 
             py_path = pyc_path if os.path.exists(pyc_path) else py_path
-            print("Loading network: %s" % py_path)
-            sys.stdout.flush()
-            module_model = imp.load_package("_network", py_path)
+            # print("Loading network: %s" % py_path)
+            # sys.stdout.flush()
+            module_model = SourceFileLoader("_network", py_path).load_module()
+            # module_model = imp.load_package("_network", py_path)
         else:
-            if self.use_simple:
-                import model_simple as module_model
-            else:
-                import model_full as module_model
+            import model_simple as module_model
 
         return module_model.StrippedNetwork(
             label_count=label_count,
@@ -151,29 +149,7 @@ class ModulePred:
         self.hram_depth.close()
         self.hram_rgba.close()
         self.hfile.close()
-
-    def predict_net(self):
-        rgb = np.copy(self.frame_rgba[..., 0:3])
-        depth = np.copy(self.frame_depth)[..., np.newaxis]
-        faces = self.facer.process(rgb)
-
-        if faces is None or faces.detections is None or len(faces.detections) == 0:
-            pred_label, nose = "empty", None
-        else:
-            rgbd = np.concatenate([rgb / 255, depth], -1, self.placeholder)
-            pc = image_to_points(rgbd, self.matrix_K,
-                                 self.depth_scale, self.depth_max)
-
-            tensor = create_tensor(np.array([pc]), device=self.network.device)
-            prediction = self.network.predict(tensor).cpu().numpy()[0]
-
-            pred_label, _, _ = self.man_labels.get_label(prediction)
-
-            face = faces.detections[0]
-            nose = face.location_data.relative_keypoints[mp_face.FaceKeyPoint.NOSE_TIP]
-            nose = {"x": nose.x, "y": nose.y}
-
-        return pred_label, nose, None
+        self.hfile_2.close()
 
     def predict_mp(self):
         rgb = np.copy(self.frame_rgba[..., 0:3])
@@ -229,8 +205,7 @@ class ModulePred:
 
     def predict(self):
 
-        pred_label, nose, pose = self.predict_mp(
-        ) if self.use_simple else self.predict_net()
+        pred_label, nose, pose = self.predict_mp()
 
         self.last_frames.append(pred_label)
         self.last_frames = self.last_frames[-self.max_frames:]
@@ -243,13 +218,12 @@ class ModulePred:
             return PRED_GOOD, true_label, self.last_frames, nose, pose
         elif true_label == "lightly hunching" or true_label == "partially lying":
             return PRED_POOR, true_label, self.last_frames, nose, pose
-
         return PRED_GRIM, true_label, self.last_frames, nose, pose
 
 
 async def main():
-    print("Proc MDL started.")
-    sys.stdout.flush()
+    # print("Proc MDL started.")
+    # sys.stdout.flush()
 
     sz_int = ctypes.sizeof(ctypes.c_int32)
     sz_float = ctypes.sizeof(ctypes.c_float)
@@ -257,20 +231,24 @@ async def main():
     port, ram_padding, use_gpu, use_simple, width, height, max_frames = struct.unpack(
         "<7I", sys.stdin.buffer.read(sz_int * 7))
 
-    print(port, ram_padding, use_gpu, use_simple, width, height, max_frames)
-    sys.stdout.flush()
+    # print(port, ram_padding, use_gpu, use_simple, width, height, max_frames)
+    # sys.stdout.flush()
 
     depth_scale, depth_max = struct.unpack(
         "<2f", sys.stdin.buffer.read(sz_float * 2))
     matrix_K = struct.unpack("<9f", sys.stdin.buffer.read(sz_float * 9))
 
     path_ram = fetch_string(sys.stdin.buffer)
-    path_model = "%s_%s" % (fetch_string(sys.stdin.buffer),
-                            "simple" if use_simple else "full")
+    path_ram = path_ram.split(',')
+    # path_ram = "/Users/eligijus/.sock"
+
+    path_model = "%s_%s" % (fetch_string(sys.stdin.buffer), "simple")
+    # path_model = "/Users/eligijus/model_simple"
     path_checkpoint = "%s/model.xth" % path_model
     str_sock = "http://127.0.0.1:%i" % port
 
-    print("Path RAM: '%s'" % path_model)
+    print("Path RAM: '%s'" % path_ram[0])
+    print("Path RAM: '%s'" % path_ram[1])
     print("Path model: '%s'" % path_model)
     print("Path checkpoint: '%s'" % path_checkpoint)
     print("Socket string: '%s'" % str_sock)
@@ -280,12 +258,17 @@ async def main():
 
     await sock.connect(str_sock)
 
-    print("Socket connection established")
-    sys.stdout.flush()
+    # print("Socket connection established")
+    # sys.stdout.flush()
 
     await sock.emit("ipc_conn", {"type": "mdl"})
 
+    # print(PATH_TAXONOMY)
+    sys.stdout.flush()
+
     man_labels = LabelManager(PATH_TAXONOMY, False)
+
+    # Cia yra problema tik neaisku kur
     pred = ModulePred(
         man_labels=man_labels,
         width=width,
@@ -293,7 +276,8 @@ async def main():
         depth_scale=depth_scale,
         depth_max=depth_max,
         matrix_K=np.reshape(matrix_K, [3, 3]),
-        path_ram=path_ram,
+        path_ram=path_ram[0],
+        path_ram_2=path_ram[1],
         path_model=path_model,
         path_checkpoint=path_checkpoint,
         max_frames=max_frames,

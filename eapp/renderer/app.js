@@ -76,7 +76,7 @@ const connections = [
     [joints.HEAD_LEFT, joints.HEAD_RIGHT],
     [joints.HEAD_RIGHT, joints.CHEST]
 ];
-
+//
 function updateCanvas(_, message) {
     calibrateData.data.set(message);
     context2d.putImageData(calibrateData, 0, 0);
@@ -93,7 +93,7 @@ function updateCanvas(_, message) {
             context2d.stroke();
         });
     }
-
+//
     const [x1, y1, x2, y2] = camCalibration;
     if (x2 > x1 && y2 > y1) {
         const { width, height } = canvasSize;
@@ -106,6 +106,7 @@ function updateCanvas(_, message) {
         context2d.stroke();
     }
 }
+
 
 function createForm(element) {
     const type = element.getAttribute("data-form");
@@ -437,36 +438,38 @@ function onSysProc(_, data) {
     elProgressbar.style.width = null;
 }
 
-function onSysCamSelect(_, data) {
+function onSysCamConfig(_, data) {
     document.body.setAttribute("view", "mode");
 
     /**
      * @type {HTMLFormElement}
      */
-    const formCamera = document.querySelector("form[data-form='select-camera']");
-    const cams = formCamera.querySelectorAll("[view-in='mode'] .camera");
+    // const formCamera = document.querySelector("form[data-form='select-camera']");
+    // const cams = formCamera.querySelectorAll("[view-in='mode'] .camera");
 
-    formCamera.addEventListener("submit", function () {
-        const form = new FormData(formCamera);
-        const camType = parseInt(form.get("cam-type"));
-        event.preventDefault();
+    // ipcRenderer.send("confCamSelected", camType);
+    // formCamera.addEventListener("submit", function () {
+    //     const form = new FormData(formCamera);
+    //     const camType = 0;
+    //     event.preventDefault();
+    //
+    //
+    // });
 
-        document.body.setAttribute("view", "dashboard");
-        document.body.setAttribute("is-calibrating", "");
-        ipcRenderer.send("confCamSelected", camType);
-    });
+    document.body.setAttribute("view", "dashboard");
+    document.body.setAttribute("is-calibrating", "");
 
-    cams.forEach(elCurrCam => {
-        /**
-         * @type {HTMLInputElement}
-         */
-        const elCamChange = elCurrCam.querySelector("input.cam-input");
-
-        elCamChange.addEventListener("change", function (e) {
-            cams.forEach(el => el.classList.remove("selected"));
-            elCurrCam.classList.add("selected");
-        });
-    });
+    // cams.forEach(elCurrCam => {
+    //     /**
+    //      * @type {HTMLInputElement}
+    //      */
+    //     const elCamChange = elCurrCam.querySelector("input.cam-input");
+    //
+    //     elCamChange.addEventListener("change", function (e) {
+    //         cams.forEach(el => el.classList.remove("selected"));
+    //         elCurrCam.classList.add("selected");
+    //     });
+    // });
 }
 
 function onWinInit(_, { windowSize, debugMode, staticVariables }) {
@@ -506,7 +509,7 @@ window.addEventListener("DOMContentLoaded", function () {
     ipcRenderer.once("winInit-reply", onWinInit);
     ipcRenderer.once("sysFetchProc-reply", onSysProc);
     ipcRenderer.on("sysProc", onSysProc);
-    ipcRenderer.on("sysCamSelect", onSysCamSelect);
+    ipcRenderer.on("sysCamConfig", onSysCamConfig);
     ipcRenderer.once("sysReady-reply", onSysReady);
     ipcRenderer.on("winResized", onResize);
 

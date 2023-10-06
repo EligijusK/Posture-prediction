@@ -7,7 +7,7 @@ const AppWindow = require("./app-window");
 const ProcessManager = require("./proc-manager");
 const { ipcMain, shell, screen } = require("electron");
 const startPythonIPC = require("./ipc");
-const { DEPTH_MAX, PATH_RAM } = require("./constants");
+const { DEPTH_MAX, PATH_RAM, PATH_RAM_2 } = require("./constants");
 const openFile = require("open");
 const initUpdateManager = require("./update-manager");
 const initHistoryManager = require("./history-man");
@@ -16,7 +16,7 @@ const NotificationList = require("./notification-list");
 const sendMail = require("./mailer");
 const fsExists = promisify(fs.exists);
 const { unzipAssets, needsUnzip } = require("./unzip-assets");
-const { createWritableDirs, getSettingPath, getTrueSettingsPath } = require("./writable-path-utils");
+const { createWritableDirs, getSettingPathMac, getTrueSettingsPath } = require("./writable-path-utils");
 const appVersion = require("./app-version");
 const Console = require("console");
 
@@ -31,7 +31,7 @@ const hdpi = screen.getPrimaryDisplay().scaleFactor;
 const [args, _] = parser.parse_known_args();
 const width = Math.floor(args.width / hdpi);
 const fopen = promisify(fs.open);
-const windowSize = { width, height: Math.round(width * (850 / 1440)) };
+const windowSize = { width, height: Math.round(width * (850 / 1440))  };
 const [WIDTH, HEIGHT, CHANNELS] = [640, 480, 4];
 const [UINT8_BYTES, FLOAT_BYTES] = [1, 4];
 const BUFFER_OFFSET = WIDTH * HEIGHT * 1 * FLOAT_BYTES;
@@ -40,7 +40,6 @@ const BUFFER_SIZE = WIDTH * HEIGHT * CHANNELS * UINT8_BYTES;
 
 async function runApp() {
     await NotificationList.init();
-
     const hasAccess = true; //await Access.checkAccess();
     const win = new AppWindow(windowSize);
 
@@ -74,17 +73,20 @@ async function runApp() {
         Access.addPasswordListener(onCorrectPassword);
 
         await win.openPasswordCheck();
-    } else {
+    }
+    else {
         if (await needsUnzip()) {
             async function onCorrectPassword() { await initPostureEvaluator(win); }
 
-            Access.addPasswordListener(onCorrectPassword);
+           Access.addPasswordListener(onCorrectPassword);
 
             await win.openFreeEntry();
-        } else await initPostureEvaluator(win);
+        }
+        else await initPostureEvaluator(win);
     }
 
     if (args.devtools) win.openDevTools();
+
 }
 
 const CAMERA_T = Object.freeze({
@@ -111,7 +113,7 @@ async function initPostureEvaluator(win) {
 
         await unzipAssets(win);
 
-        const manCfg = await initConfigManager(windowSize);
+        const manCfg = await initConfigManager(windowSize); // this is first problem
 
         win.win.addListener("minimize", function (event) {
             if (manCfg.settings.minimizeTray) {
@@ -123,16 +125,15 @@ async function initPostureEvaluator(win) {
         ipcMain.on("sysRestart", async () => {
             await manCfg.save();
             win.restart();
+            win.restart();
         });
 
-        // manCfg.settings.useRealsense = CAMERA_T.CAM_NONE;
+        manCfg.settings.useRealsense = CAMERA_T.CAM_NONE;
 
         if (manCfg.settings.useRealsense === CAMERA_T.CAM_NONE) {
-            win.sendMessage("sysCamSelect");
+            win.sendMessage("sysCamConfig");
 
-            manCfg.settings.useRealsense = await new Promise(resolve => {
-                ipcMain.once("confCamSelected", (_, val) => resolve(val));
-            });
+            manCfg.settings.useRealsense = CAMERA_T.CAM_WEBCAM;
 
             manCfg.save();
         }
@@ -149,12 +150,11 @@ async function initPostureEvaluator(win) {
         const ipcRS = await manProc.starRS({
             ipc: ipcPython,
             port: portPython,
-            pathRam: getTrueSettingsPath(PATH_RAM),
+            pathRam: getSettingPathMac(PATH_RAM),
+            pathRam2: getSettingPathMac(PATH_RAM_2),
             camera: manCfg.settings.camera,
             useSimple: isSimple
         });
-
-
 
         console.log("RS process initialized.");
 
@@ -190,7 +190,7 @@ async function initPostureEvaluator(win) {
 
         console.log("Received RS metadata.");
 
-        const fdRam = await fopen(getSettingPath(PATH_RAM), "r");
+        const fd = fs.openSync(getSettingPathMac(PATH_RAM_2), 'r+');
 
         console.log("Reading RAM file...");
 
@@ -204,11 +204,11 @@ async function initPostureEvaluator(win) {
             win.sendMessage("sysProc", { process: "proc_cam", device: deviceFound });
         });
 
-        /**
-         * map( size, protection, privacy, fd [, offset = 0 [, advise = 0]] ) -> Buffer
-         * @type {Uint8Array}
-         */
-        const ram = mmap.map(BUFFER_SIZE, mmap.PROT_READ, mmap.MAP_SHARED, fdRam, BUFFER_OFFSET + ramPadding);
+        // /**
+        //  * map( size, protection, privacy, fd [, offset = 0 [, advise = 0]] ) -> Buffer
+        //  * @type {Uint8Array}
+        //  */
+        const ram = mmap.map(BUFFER_SIZE, mmap.PROT_READ, mmap.MAP_SHARED, fd); // offset doesn't work idk why thats why using two files is solution
 
         console.log("RAM file is ready.");
 
@@ -216,8 +216,9 @@ async function initPostureEvaluator(win) {
             ipc: ipcPython,
             port: portPython,
             maxFrames: manCfg.settings.model.predictionFrames,
-            pathModel: getTrueSettingsPath(manCfg.settings.model.model),
-            pathRam: getTrueSettingsPath(PATH_RAM),
+            pathModel: getSettingPathMac(manCfg.settings.model.model),
+            pathRam: getSettingPathMac(PATH_RAM),
+            pathRam2: getSettingPathMac(PATH_RAM_2),
             width: rsDims.width,
             height: rsDims.height,
             depthScale,

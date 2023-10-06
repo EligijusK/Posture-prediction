@@ -1,0 +1,32 @@
+{
+    "calibrationSpeed": true,
+    "measureEvery": 1000,
+    "useRealsense": 0,
+    "minimizeTray": true,
+    "camera": 0,
+    "sendLogs": true,
+    "model": {
+        "model": "./model",
+        "predictionFrames": 1
+    },
+    "calibration": {
+        "enabled": true,
+        "time": 300000,
+        "size": 0.14,
+        "history": 15
+    },
+    "history": {
+        "bucketSize": 20,
+        "bucketCount": 20
+    },
+    "takeBreak": {
+        "sound": true,
+        "toast": true,
+        "time": 2700000
+    },
+    "badPosture": {
+        "sound": true,
+        "toast": true,
+        "time": 300000
+    }
+}

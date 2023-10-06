@@ -2,5 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mediapipe-silicon" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mediapipe-silicon/mediapipe-silicon" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mediapipe-silicon/mediapipe-silicon/mediapipe" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/mmdetection" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/node-speaker" vcs="Git" />
   </component>
 </project>

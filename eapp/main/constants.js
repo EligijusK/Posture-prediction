@@ -1,4 +1,4 @@
-const { getSettingPath } = require("./writable-path-utils");
+const { getSettingPathMac, getMacPathModules } = require("./writable-path-utils");
 
 const CONSTANTS = {
     COUNT_GROUPS: 20,
@@ -12,13 +12,15 @@ const CONSTANTS = {
     PASS_CORRECT: "20210309",
     PASS_TIME: 60 * 60 * 24 * 30 * 3 * 1000,
 
-    PATH_SETTINGS: getSettingPath(".configs"),
-    PATH_CALIBRATION: getSettingPath(".calibration"),
-    PATH_HISTORY: getSettingPath(".history"),
+    PATH_SETTINGS: getSettingPathMac(".configs"),
+    PATH_CALIBRATION: getSettingPathMac(".calibration"),
+    PATH_HISTORY: getSettingPathMac(".history"),
     PATH_RAM: ".sock",
+    PATH_RAM_2: ".sock_2",
+    PATH: getMacPathModules(""),
 
-    PATH_LOG_ERROR: getSettingPath("error.log"),
-    PATH_LOG_CONSOLE: getSettingPath("console.log")
+    PATH_LOG_ERROR: getSettingPathMac("error.log"),
+    PATH_LOG_CONSOLE: getSettingPathMac("console.log")
 };
 
 module.exports = CONSTANTS;

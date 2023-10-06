@@ -21,8 +21,9 @@ body, textarea, input, select { font-family: "Montserrat"; }
 
 .background {
     height: 100%;
+    width: 100%;
     background-color: gray;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
 }
 

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { promisify } = require("util");
-const { PATH_CALIBRATION, PATH_SETTINGS } = require("./constants");
+const { PATH_CALIBRATION, PATH_SETTINGS, PATH } = require("./constants");
+const app = require('electron');
 
 const fsExists = promisify(fs.exists);
 const fsReadFile = promisify(fs.readFile);
@@ -126,6 +127,8 @@ async function initConfigManager() {
 
     const man = new ConfigManager(settings, calibration);
 
+    // console.log(PATH)
+    // Main problems is path problem to config fle as expected
     await man.save();
     await man.saveCalibration();
 
