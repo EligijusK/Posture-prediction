@@ -23,6 +23,8 @@ node_modules/
 .access
 .env
 .venv
+env
+venv
 # SitYEA-*
 model_full
 model_simple
