@@ -27,7 +27,7 @@
         "nodemailer": "^6.6.3",
         "open": "^8.3.0",
         "socket.io": "^4.1.3",
-        "speaker": "/Users/eligijus/Desktop/Projektai/node-speaker",
+        "speaker": "./speaker",
         "stream-to-array": "^2.3.0",
         "wav": "^1.0.2",
         "yauzl": "^2.10.0"
