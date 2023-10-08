@@ -21,6 +21,8 @@ node_modules/
 .configs
 .history
 .access
+.env
+.venv
 # SitYEA-*
 model_full
 model_simple
