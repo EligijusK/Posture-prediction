@@ -432,9 +432,11 @@ function onSysProc(_, data) {
     const elProgressbar = document.querySelector("[data-proc-state] .progress");
     const elDataProcess = document.querySelector("[data-proc-state]");
     const elHasDev = document.querySelector("[has-dev]");
+    const elNewCam = document.querySelector("[connected-new-camera]");
 
     elDataProcess.setAttribute("data-proc-state", data.process);
     if ("device" in data) elHasDev.setAttribute("has-dev", data.device);
+    if ("camera" in data) elNewCam.setAttribute("connected-new-camera", true);
 
     elProgressbar.style.width = null;
 }

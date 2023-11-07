@@ -671,9 +671,25 @@ body[has-dev="false"] .ready-indicator .indicator::after { content: "No devices.
 
 body[has-dev="false"] .device-disconnected { display: flex; }
 
+body[connected-new-camera="true"] .device-connected { display: flex; }
+
+.device-connected-container:not(.device-connected),
+
 .disconnected-container { 
     background-image: url("../../images/no_camera.png");
     background-size: contain;
+}
+
+.device-connected-container {
+    background-image: url("../../images/no_camera.png");
+    background-size: contain;
+}
+
+.device-connected {
+    background-color: rgba(255, 255, 255, .95);
+    backdrop-filter: blur(calc(5 / var(--base-height) * var(--true-height)));
+    font-size: 5vh;
+    display: none;
 }
 
 .device-disconnected {
@@ -681,6 +697,22 @@ body[has-dev="false"] .device-disconnected { display: flex; }
     backdrop-filter: blur(calc(5 / var(--base-height) * var(--true-height)));
     font-size: 5vh;
     display: none;
+}
+
+.update-camera-button {
+    position: absolute;
+    color: white;
+    background-color: #78bb42;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.update-camera-text {
+    font-size: 18px;
+    font-family: "Montserrat";
 }
 
 .reset-camera {

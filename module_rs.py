@@ -79,6 +79,7 @@ class BaseModuleCamera:
 class ModuleWebcam(BaseModuleCamera):
     def __init__(self, coms, device_index, override_device=None):
         self.camera_count = 0
+        self.camera_count_updating = 0
         self.local_index = 0
         self.disconnected_cameras = False
         self.disconnected_camera_index = []
@@ -106,15 +107,12 @@ class ModuleWebcam(BaseModuleCamera):
         if self.capture is not None and self.capture.isOpened():
             ret, frame = self.capture.read()
 
-            # cameras_list = fetch_all_cameras()
-            # if len(cameras_list) > self.camera_count:
-            #     sock.emit("ipc_rs_err", {"ex": "dev_none"})
-
             if not ret:
                 self.disconnected_cameras = True
                 print("Camera disconnected")
                 camera_list = fetch_all_cameras()
                 print(camera_list)
+                self.camera_count_updating = len(camera_list)
                 sys.stdout.flush()
                 self.capture.release()
                 try:
@@ -150,7 +148,6 @@ class ModuleWebcam(BaseModuleCamera):
 
             if self.disconnected_cameras and self.camera_count == len(self.disconnected_camera_index):
                 print("No camera found")
-                sock.emit("ipc_rs_err", {"ex": "dev_none"})
                 sys.stdout.flush()
 
             self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
@@ -206,6 +203,11 @@ async def main():
         camera_list = await fetch_all_cameras_async()
         print(camera_list)
 
+        camera_update_count = len(camera_list)
+        if camera_update_count > rs.camera_count_updating:
+            rs.camera_count_updating = camera_update_count
+            await sock.emit("ipc_rs_new_camera", {"ex": "dev_none"})
+
         if rs.camera_count <= rs.local_index + 1:
             rs.local_index = 0
         else:
@@ -258,6 +260,7 @@ async def main():
 
                     if rs.camera_count is not None and rs.camera_count == 0:
                         rs.camera_count = len(camera_list)
+                        rs.camera_count_updating = len(camera_list)
                     # rs.capture.
                     # print("Opened?")
                     # sys.stdout.flush()
@@ -274,11 +277,9 @@ async def main():
 
                 while True:
 
-                    # print("Work?")
-                    # sys.stdout.flush()
-
                     if rs is None:
                         break
+
                     rs.queue_frame_data()
                     await sock.sleep(100 / 1000)
             except Exception as ex:

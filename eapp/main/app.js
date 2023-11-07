@@ -181,6 +181,11 @@ async function initPostureEvaluator(win) {
             win.sendMessage("sysProc", { process: "proc_cam", device: deviceFound });
         });
 
+        ipcRS.on("ipc_rs_new_camera", function ({ ex }) {
+            NotificationList[ex].send(true, false);
+            win.sendMessage("sysProc", { process: "proc_cam", camera: "Connected new camera" });
+        });
+
         const { ramPadding, dims: rsDims, depthScale, matrixK, cameraList } = await new Promise(resolve => {
 
             ipcRS.once("ipc_rs_resp", resolve);

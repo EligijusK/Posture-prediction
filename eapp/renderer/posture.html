@@ -21,7 +21,7 @@
     <link rel="preload" as="image" href="../../images/no_camera.png" as="image" />
 </head>
 
-<body view="dashboard" is-loading="true" has-dev="null">
+<body view="dashboard" is-loading="true" connected-new-camera="false" has-dev="null">
     <div class="background"></div>
     <div view-in="calibrate" class="fullscreen-container">
         <div id="canvas-container" class="canvas-container fullscreen-container"></div>
@@ -105,6 +105,7 @@
                     <span class="slider round"></span>
                 </span>
             </span>
+        </label>
     </div>
     <div view-in="dashboard" class="settings-container fullscreen-container">
         <label class="switch minimize-tray">
@@ -212,9 +213,14 @@
             </div>
         </div>
     </div>
-    <div class="disconnected-container centered fullscreen-container device-disconnected">
+    <div class="disconnected-container centered fullscreen-container device-disconnected"> <!-- this ir reset container if camera doesn't exist need simalar element in app need reset button for cameras -->
         <div class="fullscreen-container">
             <div data-action="camera:reset" class="reset-camera button"></div>
+        </div>
+    </div>
+    <div class="device-connected-container centered fullscreen-container device-connected"> <!-- this ir reset container if camera doesn't exist need simalar element in app need reset button for cameras -->
+        <div class="fullscreen-container">
+            <div data-action="camera:reset" class="reset-camera update-camera-button"><div class="update-camera-text" >Connect new camera</div></div>
         </div>
     </div>
     <div id="toast" class="toast hidden">Toast...</div>
