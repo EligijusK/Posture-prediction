@@ -13,7 +13,6 @@ from utils.fetch_cameras import fetch_all_cameras_async, fetch_all_cameras
 from rs.exceptions import NoDeviceException, USB30Exception, DevInUseException
 
 WIDTH, HEIGHT = 640, 480
-camera_count = 0
 # override_device = "/home/ratchet/Downloads/RS_D435I_20210428_175414.bag"
 # override_device = "/home/ratchet/Downloads/Telegram Desktop/bandicam 2022-11-15 06-13-54-394.mp4"
 
@@ -78,6 +77,11 @@ class BaseModuleCamera:
 
 class ModuleWebcam(BaseModuleCamera):
     def __init__(self, coms, device_index, override_device=None):
+        self.camera_count = 0
+        self.local_index = 0
+        self.disconnected_cameras = False
+        self.switched_cameras = False
+        self.disconnected_camera_index = []
         print("override_device:", override_device, flush=True)
 
         if override_device is None:
@@ -103,6 +107,7 @@ class ModuleWebcam(BaseModuleCamera):
             ret, frame = self.capture.read()
 
             if not ret:
+                self.disconnected_cameras = True
                 print("Camera disconnected")
                 camera_list = fetch_all_cameras()
                 print(camera_list)
@@ -112,24 +117,38 @@ class ModuleWebcam(BaseModuleCamera):
                     # temp_capture = cv2.VideoCapture(1) # reikia trackinti visus indeksus jei kamera atsijungia bandyti prisijungti prie kazkurio is indeksu, kai pavyksta istrinti praeita open cv kintamaji ir ji perasyti reiskia reikia manidzinti ir indeksus pagal tai
                     # self.capture = cv2.VideoCapture(camera_list[0]["camera_index"])
                     index = 0
-                    for count in camera_count:
-                        temp_capture = cv2.VideoCapture(
-                            index)  # reikia trackinti visus indeksus jei kamera atsijungia bandyti prisijungti prie kazkurio is indeksu, kai pavyksta istrinti praeita open cv kintamaji ir ji perasyti reiskia reikia manidzinti ir indeksus pagal tai
-                        if temp_capture.isOpened():
-                            print("Camera connected!")
-                            sys.stdout.flush()
-                            if temp_capture.read()[0]:
-                                del self.capture
-                                self.capture = temp_capture
-                        index += 1
-
+                    if self.camera_count > 0:
+                        print("camera count: " + str(self.camera_count))
+                        sys.stdout.flush()
+                        for count in range(self.camera_count):
+                            temp_capture = cv2.VideoCapture(index) # reikia saugoti indeksus kurie neveikia, kad negaletu pajungti kameros ir reikia ismesti message jei buvo pajungta kamera is naujo kad restartinti apsa
+                            if temp_capture.isOpened():
+                                if temp_capture.read()[0]:
+                                    del self.capture
+                                    self.capture = cv2.VideoCapture(index)
+                                    ret, frame = self.capture.read()
+                                    print("Camera connected! " + str(index))
+                                    sys.stdout.flush()
+                                    temp_capture.release()
+                                    self.local_index = index
+                                    self.switched_cameras = True
+                                    del temp_capture
+                                    break
+                                else:
+                                    if index not in self.disconnected_camera_index:
+                                        self.disconnected_camera_index.append(index)
+                                    temp_capture.release()
+                            index += 1
                 except Exception as ex:
                     print(ex)
                     sys.stdout.flush()
 
+            if self.disconnected_cameras and not self.switched_cameras:
+                print("No camera found")
+                sys.stdout.flush()
+
             self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
             self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-
             frame = cv2.resize(frame, (WIDTH, HEIGHT))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -181,11 +200,19 @@ async def main():
         camera_list = await fetch_all_cameras_async()
         print(camera_list)
 
-        if len(camera_list) <= index:
-            index = 0
+        if rs.camera_count <= rs.local_index + 1:
+            rs.local_index = 0
+        else:
+            rs.local_index += 1
+
+        while rs.local_index in rs.disconnected_camera_index and rs.camera_count != len(rs.disconnected_camera_index):
+            if rs.local_index + 1 >= rs.camera_count:
+                rs.local_index = 0
+            else:
+                rs.local_index += 1
 
         rs.capture.release()
-        rs.capture.open(camera_list[index]["camera_index"]) # if cam_idx < 0 else cam_idx
+        rs.capture.open(rs.local_index) # if cam_idx < 0 else cam_idx
         # rs = ModuleWebcam(coms, cam_idx)
         # sys.stdout.flush()
 
@@ -201,6 +228,7 @@ async def main():
                     # sys.stdout.flush()
                     camera_list = await fetch_all_cameras_async()
                     print(camera_list)
+
                     sys.stdout.flush()
 
                     # print("Using")
@@ -208,13 +236,15 @@ async def main():
 
                     if len(camera_list) == 0:
                         raise NoDeviceException()
-                    camera_count = len(camera_list)
+
                     if rs is None:
                         rs = ModuleWebcam(coms, camera_list[0]["camera_index"]) #  if cam_idx < 0 else cam_idx, override_device
                     else:
                         rs.capture.release()
                         rs.capture.open(camera_list[0]["camera_index"]) # if cam_idx < 0 else cam_idx
 
+                    if rs.camera_count is not None and rs.camera_count == 0:
+                        rs.camera_count = len(camera_list)
                     # rs.capture.
                     # print("Opened?")
                     # sys.stdout.flush()

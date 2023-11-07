@@ -255,7 +255,7 @@ shutil.copytree("./win_libs", "%s/win_libs" % root_path)
 [copy_model(name, "%s/%s" % (model_dir, mdl), "") for name, mdl in model_lst]
 
 copy_file_path("data/label_hierarchy.json", "%s/resources/app/data/" % js_path)
-copy_file_path("%s/model_simple/model.xth" % root_path, "%s/resources/app/model_simple/" % js_path)
+copy_file_path("%s/model_simple/model.xth" % root_path, "%s/resources/app/model/" % js_path)
 # print("%s/model_simple" % root_path)
 # copy_directory("%s/model_simple" % root_path, "%s/resources/app/model_simple/" % js_path)
 copy_directory(os.path.realpath("./dist/modules.app"), "%s/Frameworks/modules.app" % js_path)
