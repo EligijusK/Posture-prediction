@@ -25,6 +25,9 @@ let isDebugMode = false;
  */
 let context2d;
 
+let currentCamera = 0;
+let cameraMaxIndex = -1;
+
 const canvasSize = { width: 0, height: 0 };
 const camCalibration = new Float32Array([Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER]);
 let appSettings = null;
@@ -198,8 +201,16 @@ function createAction(element) {
     function onCameraEvent(value) {
         switch (value) {
             case "select": {
-                const camValue = parseInt(element.value);
-                if (camValue >= 0) ipcRenderer.send("setCamera", camValue);
+                // const camValue = parseInt(element.value);
+                if(currentCamera < cameraMaxIndex){
+                    currentCamera += 1;
+                }
+                else {
+                    currentCamera = 0;
+                }
+                if (currentCamera >= 0) ipcRenderer.send("setCamera", currentCamera);
+                // console.warn("current camera index: " + currentCamera)
+                // console.warn("max camera index: " + cameraMaxIndex)
             } break;
             case "calibrated":
                 document.body.removeAttribute("is-calibrating");
@@ -345,18 +356,8 @@ function onSysInit(_, { useSimple, settings, calibration, cameraList,
     if (isSimpleModel) {
         if (isDebugMode) ipcRenderer.on("updatePose", onUpdatePose);
 
-        const select = document.getElementById("camera-list");
-        select.innerHTML = "";
-
         cameraList.forEach(({ camera_index, camera_name }) => {
-            const opt = document.createElement("option");
-
-            opt.value = camera_index;
-            opt.text = camera_name;
-
-            if (camera_index === settings.camera) opt.selected = true;
-
-            select.appendChild(opt);
+            cameraMaxIndex += 1;
         });
     }
 

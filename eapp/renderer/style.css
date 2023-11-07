@@ -190,6 +190,18 @@ body[view="mode"] [view-in="mode"] { display: block; }
     font-weight: bold;
 }
 
+.camera-select {
+    background-color:#109cf1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    height: 40px;
+    font-size: 130%;
+    font-family: "Montserrat";
+    cursor: pointer;
+}
+
 .settings-container select,
 .change-mode select,
 .cam-list select {

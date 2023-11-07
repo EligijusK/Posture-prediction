@@ -121,6 +121,14 @@ def copy_file(path):
 
     shutil.copy(path, "%s/%s" % (root_path, path))
 
+def copy_file_path(path, out_path):
+    os.makedirs(out_path, exist_ok=True)
+    shutil.copy(path, out_path)
+
+def copy_directory(path, out_path, symlinks=True):
+    # os.makedirs(out_path, exist_ok=True)
+    shutil.copytree(path, out_path, symlinks=symlinks)
+
 def make_init(path):
     dir_name = os.path.dirname(path)
     out_dir = "%s/%s" % (root_path, dir_name)
@@ -222,6 +230,7 @@ copy_file("rs/exceptions.py")
 make_init("data/__init__.py")
 copy_file("data/label_manager.py")
 copy_file("data/label_hierarchy.json")
+copy_file("data/label_hierarchy.json")
 
 make_init("configs/__init__.py")
 copy_file("configs/config.py")
@@ -244,3 +253,11 @@ shutil.copy("SitYEA-install.ism", "%s/SitYEA-install.ism" % out_dir)
 shutil.copytree("./win_libs", "%s/win_libs" % root_path)
 
 [copy_model(name, "%s/%s" % (model_dir, mdl), "") for name, mdl in model_lst]
+
+copy_file_path("data/label_hierarchy.json", "%s/resources/app/data/" % js_path)
+copy_file_path("%s/model_simple/model.xth" % root_path, "%s/resources/app/model_simple/" % js_path)
+# print("%s/model_simple" % root_path)
+# copy_directory("%s/model_simple" % root_path, "%s/resources/app/model_simple/" % js_path)
+copy_directory(os.path.realpath("./dist/modules.app"), "%s/Frameworks/modules.app" % js_path)
+os.remove("%s/resources/app/node_modules/speaker" % js_path)
+copy_directory("node_modules/speaker", "%s/resources/app/node_modules/speaker" % js_path, False)

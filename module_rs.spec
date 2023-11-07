@@ -5,7 +5,7 @@ block_cipher = None
 a = Analysis(['module_rs.py'],
              pathex=[],
              binaries=None,
-             datas=[('/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/bin/data/*.json','data')],
+             datas=[('/Users/eligijus/Desktop/Projektai/Posture-prediction/data/*.json','data')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
@@ -68,7 +68,7 @@ exe = EXE(pyz,
           argv_emulation=False,
           target_arch=None,
           codesign_identity='Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)',
-          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/entitlements.mas.plist', )
+          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/entitlements.mac.plist', )
 
 exe2 = EXE(pyz2,
           a2.scripts,
@@ -85,7 +85,7 @@ exe2 = EXE(pyz2,
           argv_emulation=False,
           target_arch=None,
           codesign_identity='Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)',
-          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/entitlements.mas.plist', )
+          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/entitlements.mac.plist', )
 
 exe3 = EXE(pyz3,
           a3.scripts,
@@ -102,7 +102,7 @@ exe3 = EXE(pyz3,
           argv_emulation=False,
           target_arch=None,
           codesign_identity='Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)',
-          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYea/entitlements.mas.plist', )
+          entitlements_file='/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/entitlements.mac.plist', )
 
 
 coll = COLLECT(exe,

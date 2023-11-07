@@ -9,10 +9,11 @@ import socketio
 import aiohttp
 import numpy as np
 from utils.fetch_string import fetch_string
-from utils.fetch_cameras import fetch_all_cameras
+from utils.fetch_cameras import fetch_all_cameras_async, fetch_all_cameras
 from rs.exceptions import NoDeviceException, USB30Exception, DevInUseException
 
 WIDTH, HEIGHT = 640, 480
+camera_count = 0
 # override_device = "/home/ratchet/Downloads/RS_D435I_20210428_175414.bag"
 # override_device = "/home/ratchet/Downloads/Telegram Desktop/bandicam 2022-11-15 06-13-54-394.mp4"
 
@@ -77,35 +78,62 @@ class BaseModuleCamera:
 
 class ModuleWebcam(BaseModuleCamera):
     def __init__(self, coms, device_index, override_device=None):
-        # print("override_device:", override_device, flush=True)
+        print("override_device:", override_device, flush=True)
 
         if override_device is None:
-            # print(device_index)
-            self.capture = cv2.VideoCapture(device_index)
-            # print("Setup Video Capture Device", flush=True)
+            print(device_index)
+            self.capture = cv2.VideoCapture()
+            print("Setup Video Capture Device", flush=True)
         else:
-            # print("use captured vide!!!!!!!!1", flush=True)
-            self.capture = cv2.VideoCapture(override_device)
+            print("use captured vide!!!!!!!!1", flush=True)
+            self.capture = cv2.VideoCapture()
 
-
+        self.capture.open(device_index)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
-        # print("Video Configuration", flush=True)
+        print("Video Configuration", flush=True)
+        sys.stdout.flush()
         super().__init__(coms)
 
     def __del__(self):
         self.capture.release()
 
     def queue_frame_data(self):
-        ret, frame = self.capture.read()
+        if self.capture is not None and self.capture.isOpened():
+            ret, frame = self.capture.read()
 
-        if not ret:
-            raise Exception("Camera disconnected")
+            if not ret:
+                print("Camera disconnected")
+                camera_list = fetch_all_cameras()
+                print(camera_list)
+                sys.stdout.flush()
+                self.capture.release()
+                try:
+                    # temp_capture = cv2.VideoCapture(1) # reikia trackinti visus indeksus jei kamera atsijungia bandyti prisijungti prie kazkurio is indeksu, kai pavyksta istrinti praeita open cv kintamaji ir ji perasyti reiskia reikia manidzinti ir indeksus pagal tai
+                    # self.capture = cv2.VideoCapture(camera_list[0]["camera_index"])
+                    index = 0
+                    for count in camera_count:
+                        temp_capture = cv2.VideoCapture(
+                            index)  # reikia trackinti visus indeksus jei kamera atsijungia bandyti prisijungti prie kazkurio is indeksu, kai pavyksta istrinti praeita open cv kintamaji ir ji perasyti reiskia reikia manidzinti ir indeksus pagal tai
+                        if temp_capture.isOpened():
+                            print("Camera connected!")
+                            sys.stdout.flush()
+                            if temp_capture.read()[0]:
+                                del self.capture
+                                self.capture = temp_capture
+                        index += 1
 
-        frame = cv2.resize(frame, (WIDTH, HEIGHT))
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                except Exception as ex:
+                    print(ex)
+                    sys.stdout.flush()
 
-        self.frame_rgba[..., 0:3] = frame
+            self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+            self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+
+            frame = cv2.resize(frame, (WIDTH, HEIGHT))
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            self.frame_rgba[..., 0:3] = frame
 
 
 async def main():
@@ -150,14 +178,16 @@ async def main():
     @sock.on("ipc_rs_cam")
     async def on_ipc_rs_cam(index):
         nonlocal rs
-        # print("Changing the camera to: %i" % index)
-        cam_idx = index
-        if rs is not None:
-            del rs
-            rs = None
-        await sock.sleep(100 / 1000)
-        rs = ModuleWebcam(coms, cam_idx)
-        sys.stdout.flush()
+        camera_list = await fetch_all_cameras_async()
+        print(camera_list)
+
+        if len(camera_list) <= index:
+            index = 0
+
+        rs.capture.release()
+        rs.capture.open(camera_list[index]["camera_index"]) # if cam_idx < 0 else cam_idx
+        # rs = ModuleWebcam(coms, cam_idx)
+        # sys.stdout.flush()
 
     @sock.on("ipc_rs")
     async def on_ipc_rs():
@@ -169,19 +199,23 @@ async def main():
                 if use_simple:
                     # print("Using simple model.")
                     # sys.stdout.flush()
-                    camera_list = await fetch_all_cameras()
+                    camera_list = await fetch_all_cameras_async()
+                    print(camera_list)
+                    sys.stdout.flush()
 
                     # print("Using")
                     # sys.stdout.flush()
 
                     if len(camera_list) == 0:
                         raise NoDeviceException()
+                    camera_count = len(camera_list)
+                    if rs is None:
+                        rs = ModuleWebcam(coms, camera_list[0]["camera_index"]) #  if cam_idx < 0 else cam_idx, override_device
+                    else:
+                        rs.capture.release()
+                        rs.capture.open(camera_list[0]["camera_index"]) # if cam_idx < 0 else cam_idx
 
-                    # print(camera_list)
-                    # sys.stdout.flush()
-
-                    rs = ModuleWebcam(coms, camera_list[0]["camera_index"] if cam_idx < 0 else cam_idx, override_device)
-
+                    # rs.capture.
                     # print("Opened?")
                     # sys.stdout.flush()
 

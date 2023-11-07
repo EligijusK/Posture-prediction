@@ -132,11 +132,12 @@ class ModulePred:
             pyc_path = "%s/__init__.pyc" % path_model
 
             py_path = pyc_path if os.path.exists(pyc_path) else py_path
-            # print("Loading network: %s" % py_path)
-            # sys.stdout.flush()
+
             module_model = SourceFileLoader("_network", py_path).load_module()
             # module_model = imp.load_package("_network", py_path)
         else:
+            print("Loading network: %s" % path_model)
+            sys.stdout.flush()
             import model_simple as module_model
 
         return module_model.StrippedNetwork(
@@ -242,8 +243,9 @@ async def main():
     path_ram = path_ram.split(',')
     # path_ram = "/Users/eligijus/.sock"
 
-    path_model = "%s_%s" % (fetch_string(sys.stdin.buffer), "simple")
-    # path_model = "/Users/eligijus/model_simple"
+
+
+    path_model = fetch_string(sys.stdin.buffer)
     path_checkpoint = "%s/model.xth" % path_model
     str_sock = "http://127.0.0.1:%i" % port
 

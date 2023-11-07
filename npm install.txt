@@ -4,6 +4,8 @@ npm cache --force clean
 
 node-gyp rebuild
 
+npm install --save ./speaker
+
 npx electron-rebuild ./node_modules/@raygun-nickj/mmap-io/
 
 npx electron-rebuild ./node_modules/speaker/

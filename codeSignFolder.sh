@@ -6,7 +6,7 @@ APP_KEY="Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)"
 INSTALLER_KEY="3rd Party Mac Developer Installer: Eligijus Kiudys (KD96Z4GRH7)"
 # The path of your plist files.
 CHILD_PLIST="/path/to/child.plist"
-PARENT_PLIST="./entitlements.mas.plist"
+PARENT_PLIST="./entitlements.mac.plist"
 
 #array=()
 #find . -type f -name "*.so" -print0 > tmpfile
