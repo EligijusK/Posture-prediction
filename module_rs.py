@@ -8,6 +8,7 @@ import asyncio
 import socketio
 import aiohttp
 import numpy as np
+import importlib
 from utils.fetch_string import fetch_string
 from utils.fetch_cameras import fetch_all_cameras_async, fetch_all_cameras
 from rs.exceptions import NoDeviceException, USB30Exception, DevInUseException
@@ -105,6 +106,10 @@ class ModuleWebcam(BaseModuleCamera):
         if self.capture is not None and self.capture.isOpened():
             ret, frame = self.capture.read()
 
+            # cameras_list = fetch_all_cameras()
+            # if len(cameras_list) > self.camera_count:
+            #     sock.emit("ipc_rs_err", {"ex": "dev_none"})
+
             if not ret:
                 self.disconnected_cameras = True
                 print("Camera disconnected")
@@ -122,7 +127,7 @@ class ModuleWebcam(BaseModuleCamera):
                         for count in range(self.camera_count):
                             if index >= self.camera_count:
                                 index = 0
-                            temp_capture = cv2.VideoCapture(index) # reikia saugoti indeksus kurie neveikia, kad negaletu pajungti kameros ir reikia ismesti message jei buvo pajungta kamera is naujo kad restartinti apsa
+                            temp_capture = cv2.VideoCapture(index)
                             if temp_capture.isOpened():
                                 if temp_capture.read()[0]:
                                     del self.capture
