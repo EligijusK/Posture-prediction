@@ -80,7 +80,6 @@ class ModuleWebcam(BaseModuleCamera):
         self.camera_count = 0
         self.local_index = 0
         self.disconnected_cameras = False
-        self.switched_cameras = False
         self.disconnected_camera_index = []
         print("override_device:", override_device, flush=True)
 
@@ -116,11 +115,13 @@ class ModuleWebcam(BaseModuleCamera):
                 try:
                     # temp_capture = cv2.VideoCapture(1) # reikia trackinti visus indeksus jei kamera atsijungia bandyti prisijungti prie kazkurio is indeksu, kai pavyksta istrinti praeita open cv kintamaji ir ji perasyti reiskia reikia manidzinti ir indeksus pagal tai
                     # self.capture = cv2.VideoCapture(camera_list[0]["camera_index"])
-                    index = 0
+                    index = self.local_index
                     if self.camera_count > 0:
                         print("camera count: " + str(self.camera_count))
                         sys.stdout.flush()
                         for count in range(self.camera_count):
+                            if index >= self.camera_count:
+                                index = 0
                             temp_capture = cv2.VideoCapture(index) # reikia saugoti indeksus kurie neveikia, kad negaletu pajungti kameros ir reikia ismesti message jei buvo pajungta kamera is naujo kad restartinti apsa
                             if temp_capture.isOpened():
                                 if temp_capture.read()[0]:
@@ -131,7 +132,6 @@ class ModuleWebcam(BaseModuleCamera):
                                     sys.stdout.flush()
                                     temp_capture.release()
                                     self.local_index = index
-                                    self.switched_cameras = True
                                     del temp_capture
                                     break
                                 else:
@@ -143,8 +143,9 @@ class ModuleWebcam(BaseModuleCamera):
                     print(ex)
                     sys.stdout.flush()
 
-            if self.disconnected_cameras and not self.switched_cameras:
+            if self.disconnected_cameras and self.camera_count == len(self.disconnected_camera_index):
                 print("No camera found")
+                sock.emit("ipc_rs_err", {"ex": "dev_none"})
                 sys.stdout.flush()
 
             self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
@@ -206,10 +207,17 @@ async def main():
             rs.local_index += 1
 
         while rs.local_index in rs.disconnected_camera_index and rs.camera_count != len(rs.disconnected_camera_index):
-            if rs.local_index + 1 >= rs.camera_count:
+            if rs.local_index >= rs.camera_count: # jei isjungiame vidurinia kamera paskutines kameros swicho metu nebepajungia
                 rs.local_index = 0
             else:
                 rs.local_index += 1
+            print(rs.local_index)
+            sys.stdout.flush()
+
+        print(rs.disconnected_camera_index)
+        # print(rs.local_index in rs.disconnected_camera_index and rs.camera_count != len(rs.disconnected_camera_index))
+        # print(rs.local_index)
+        sys.stdout.flush()
 
         rs.capture.release()
         rs.capture.open(rs.local_index) # if cam_idx < 0 else cam_idx
