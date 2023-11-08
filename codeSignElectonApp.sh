@@ -13,6 +13,7 @@ NODE_FRAMEWORKS_PATH="$APP_PATH/Contents/Resources/app"
 
 find "$FRAMEWORKS_PATH" -maxdepth 1 -type d ! -name "module*.app" -print0 >> tmpFile
 find "$NODE_FRAMEWORKS_PATH" -type f -name "*.node" -print0 >> tmpNodeFileExe
+find "$NODE_FRAMEWORKS_PATH/node_modules/speaker/build/node_gyp_bins" -type f -perm +0111 -name "*" -print0 >> tmpNodeFileExe
 
 arrayPath=()
 while IFS="\n" read -r -d $'\0'; do
@@ -33,7 +34,7 @@ for i in $(seq 1 $count); do
 done
 
 while IFS="\n" read -r -d $'\0'; do
-  codesign -s "$APP_KEY" -f --deep --verbose --entitlements "$PARENT_PLIST_INHERIT" "$REPLY"
+  codesign -s "$APP_KEY" -f --deep --verbose --options=runtime --entitlements "$PARENT_PLIST_INHERIT" "$REPLY"
 done < tmpNodeFileExe
 rm -f tmpNodeFileExe
 
