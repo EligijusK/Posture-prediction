@@ -681,7 +681,7 @@ body[connected-new-camera="true"] .device-connected { display: flex; }
 }
 
 .device-connected-container {
-    background-image: url("../../images/no_camera.png");
+    background-image: url("../../images/camera_connected.png");
     background-size: contain;
 }
 
@@ -718,6 +718,13 @@ body[connected-new-camera="true"] .device-connected { display: flex; }
 .reset-camera {
     left: calc(603 / var(--base-width) * var(--true-width));
     top: calc(490 / var(--base-height) * var(--true-height));
+    width: calc(216 / var(--base-width) * var(--true-width));
+    height: calc(55 / var(--base-height) * var(--true-height));
+}
+
+.update-camera {
+    left: calc(590 / var(--base-width) * var(--true-width));
+    top: calc(470 / var(--base-height) * var(--true-height));
     width: calc(216 / var(--base-width) * var(--true-width));
     height: calc(55 / var(--base-height) * var(--true-height));
 }

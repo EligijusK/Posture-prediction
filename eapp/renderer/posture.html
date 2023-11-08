@@ -19,6 +19,7 @@
     <link rel="preload" as="image" href="../../images/calib_init_2d.png" as="image" />
     <link rel="preload" as="image" href="../../images/calib_init_3d.png" as="image" />
     <link rel="preload" as="image" href="../../images/no_camera.png" as="image" />
+    <link rel="preload" as="image" href="../../images/camera_connected.png" as="image" />
 </head>
 
 <body view="dashboard" is-loading="true" connected-new-camera="false" has-dev="null">
@@ -220,7 +221,7 @@
     </div>
     <div class="device-connected-container centered fullscreen-container device-connected"> <!-- this ir reset container if camera doesn't exist need simalar element in app need reset button for cameras -->
         <div class="fullscreen-container">
-            <div data-action="camera:reset" class="reset-camera update-camera-button"><div class="update-camera-text" >Connect new camera</div></div>
+            <div data-action="camera:reset" class="update-camera update-camera-button"><div class="update-camera-text" >Connect new camera</div></div>
         </div>
     </div>
     <div id="toast" class="toast hidden">Toast...</div>
