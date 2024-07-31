@@ -4,6 +4,7 @@ const HistoryTotals = require("./history/history-totals");
 const initAppSettings = require("./app-settings");
 const showToast = require("./show-toast");
 const TOAST_LIST = require("./toast-list");
+const http = require('http');
 
 webFrame.setZoomFactor(1);
 
@@ -439,6 +440,41 @@ function onSysProc(_, data) {
     if ("camera" in data) elNewCam.setAttribute("connected-new-camera", true);
 
     elProgressbar.style.width = null;
+}
+
+function request() {
+
+    const http = require('http');
+
+    const data = JSON.stringify({ key: 'value' });
+
+    const options = {
+      hostname: 'https://sityea-web-app-yj9bs.ondigitalocean.app',
+      path: '/result/create',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length,
+      },
+    };
+
+    const req = http.request(options, (res) => {
+        let responseData = '';
+        res.on('data', (chunk) => {
+            responseData += chunk;
+        });
+
+        res.on('end', () => {
+            console.log('Response:', responseData);
+        });
+    });
+    req.on('error', (error) => {
+        console.error('Error:', error);
+    });
+
+    req.write(data);
+    req.end();
+
 }
 
 function onSysCamConfig(_, data) {
