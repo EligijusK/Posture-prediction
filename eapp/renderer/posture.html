@@ -108,6 +108,29 @@
             </span>
         </label>
     </div>
+    <div view-in="settings" class="fullscreen-container">
+        <div class="version-number">Version: <span data-static="app_ver">#version</span></div>
+        <div class="button open-homepage" data-action="navigate:sityea"></div>
+        <div class="button open-privacy" data-action="navigate:privacy"></div>
+        <div class="button open-terms" data-action="navigate:terms"></div>
+        <div class="button open-console-log" data-action="open:console.log"></div>
+<!--        <div class="settings-container">-->
+<!--            <form data-form="send-mail">-->
+<!--                <textarea name="mail-contents" class="mail-contents"-->
+<!--                    placeholder="What do you think of SiytYEA?"></textarea>-->
+<!--                <input class="mail-submit button" value="" type="submit" />-->
+<!--            </form>-->
+<!--        </div>-->
+<!--        <label class="switch-container  send-logs">-->
+<!--            <input type="checkbox" config-toggle="sendLogs">-->
+<!--            <span class="label-switch">-->
+<!--                <span class="label"></span>-->
+<!--                <span class="switch">-->
+<!--                    <span class="slider round"></span>-->
+<!--                </span>-->
+<!--            </span>-->
+<!--        </label>-->
+    </div>
     <div view-in="dashboard" class="settings-container fullscreen-container">
         <label class="switch minimize-tray">
             <input type="checkbox" checked config-toggle="minimizeTray">
@@ -189,6 +212,9 @@
         <div data-action="view:exercises" class="button exercises"></div>
         <div data-action="view:workspace" class="button workspace"></div>
         <div data-action="view:about" class="button about"></div>
+        <input config-type="number" class="input sync" config-multiplier="1000" config-key="syncEvery" type="number" value="1" min="1" max="999" maxlength="3" />
+        <input config-type="text" class="input token" config-key="token" type="text" value="labas" />
+        <div data-action="view:settings" class="button sync">Sync Data</div>
 <!--        <div class="change-mode">-->
 <!--            <select data-action="camera:type" config-key="useRealsense">-->
 <!--                <option value="0">Integrated Camera (2D)</option>-->

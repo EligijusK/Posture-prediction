@@ -24,6 +24,7 @@
         "@raygun-nickj/mmap-io": "^1.4.0",
         "argparse": "^2.0.1",
         "debug": "^4.3.4",
+        "jwt-decode": "^4.0.0",
         "nodemailer": "^6.6.3",
         "open": "^8.3.0",
         "socket.io": "^4.1.3",

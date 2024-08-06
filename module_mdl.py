@@ -18,10 +18,10 @@ from data.label_manager import LabelManager
 from torch import cuda, tensor as create_tensor
 
 # Other
-# PATH_TAXONOMY = get_asset_path("data/label_hierarchy.json")
+PATH_TAXONOMY = get_asset_path("data/label_hierarchy.json")
 
 # Mac OS Build
-PATH_TAXONOMY = get_asset_path("../Resources/data/label_hierarchy.json")
+# PATH_TAXONOMY = get_asset_path("../Resources/data/label_hierarchy.json")
 
 mp_drawing = mpipe.solutions.drawing_utils
 mp_face = mpipe.solutions.face_detection

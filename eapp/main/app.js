@@ -262,7 +262,8 @@ async function initPostureEvaluator(win) {
                 useSimple: isSimple,
                 history: {
                     hourly: historyMan.hourly,
-                    totals: historyMan.totals
+                    totals: historyMan.totals,
+                    sync: historyMan.sync
                 }
             });
         });

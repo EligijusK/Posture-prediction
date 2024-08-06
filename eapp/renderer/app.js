@@ -1,6 +1,7 @@
 const { ipcRenderer, webFrame, remote } = require("electron");
 const HistoryHourly = require("./history/history-hourly");
 const HistoryTotals = require("./history/history-totals");
+const HistorySync = require("./history/history-sync")
 const initAppSettings = require("./app-settings");
 const showToast = require("./show-toast");
 const TOAST_LIST = require("./toast-list");
@@ -16,9 +17,9 @@ let historyHourly = null;
  * @type {HistoryTotal}
  */
 let historyTotals = null;
-
 let isSimpleModel = false;
 let isDebugMode = false;
+let historySync = null;
 
 /**
  * @type {CanvasRenderingContext2D}
@@ -325,6 +326,10 @@ function onUpdateHistories(_, { hourly, totals }) {
     historyTotals.updateValues(totals);
 }
 
+function onUpdateSync(_, { sync }) {
+    historySync.updateValues(sync);
+}
+
 function onUpdateCalibration(_, _calibration) { camCalibration.set(_calibration); }
 
 function onUpdatePose(_, newPose) { pose.forEach((arr, i) => { arr.set(newPose[i]) }); }
@@ -349,8 +354,9 @@ function onSysInit(_, { useSimple, settings, calibration, cameraList,
     camCalibration.set(calibration);
     historyHourly = new HistoryHourly(document.getElementById("statistics-hourly"), appSettings, hourly);
     historyTotals = new HistoryTotals(document.getElementById("statistics-totals"), appSettings, totals);
-
+    historySync = new HistorySync(appSettings);
     ipcRenderer.on("historyUpdate", onUpdateHistories);
+    ipcRenderer.on("syncData", onUpdateSync);
     ipcRenderer.on("calibrationUpdate", onUpdateCalibration);
 
     if (isSimpleModel) {
@@ -435,89 +441,10 @@ function onSysProc(_, data) {
     const elNewCam = document.querySelector("[connected-new-camera]");
 
     elDataProcess.setAttribute("data-proc-state", data.process);
-    request();
     if ("device" in data) elHasDev.setAttribute("has-dev", data.device);
     if ("camera" in data) elNewCam.setAttribute("connected-new-camera", true);
 
     elProgressbar.style.width = null;
-}
-
-function request() {
-
-
-    // const data = JSON.stringify({
-    //     day: '2022-11-27',
-    //     correct: 40,
-    //     hunched: 160,
-    //     incorrect: 160,
-    //     away: 240
-    // });
-
-    // const options = {
-    //   hostname: 'sityea-web-app-yj9bs.ondigitalocean.app',
-    //   path: '/result/create',
-    //   method: 'POST',
-    //     headers: {
-    //         'Accept-Encoding': 'gzip, deflate, br',
-    //         'Connection': 'keep-alive',
-    //         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    //         'Content-Type': 'application/json',
-    //         'Content-Length': data.length,
-    //         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE2YTE2YTM2LWExYjMtNDMzZS1hZTA1LTgwOTU0OGM5YTcxZCIsImV4cGlyZXNJbiI6MTcyMjQ5Njg1OTE1MSwicm9sZSI6InVzZXIiLCJpYXQiOjE3MjI0MTA0NTl9.sCY5GzXPr00wwKTaq7ELFBVkzff3F7gxhu1WE-w9_-4'
-    //     }
-    // };
-
-
-    console.log("trying ...")
-
-    const data = JSON.stringify({
-        day: '2022-11-27',
-        correct: 40,
-        hunched: 160,
-        incorrect: 160,
-        away: 240
-    });
-
-
-    const res = fetch('https://sityea-back-app-f9omq.ondigitalocean.app/result/create', {
-        method: 'POST',
-        body: data,
-        headers: {
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE2YTE2YTM2LWExYjMtNDMzZS1hZTA1LTgwOTU0OGM5YTcxZCIsImV4cGlyZXNJbiI6MTcyMjUxODA5OTgwMywicm9sZSI6InVzZXIiLCJpYXQiOjE3MjI0MzE2OTl9.cMO8is4dAYE2UZnxkHv-vWnbS9XuaccHADfkPPS9yrc",
-            'accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Content-Length': data.length,
-            'Connection': 'keep-alive',
-            'Host': 'sityea-web-app-yj9bs.ondigitalocean.app'
-            // fyi, NO need for content length
-        }
-    }).then(response => response.status)
-        .then(data => {console.log(data);})
-        .catch(error => console.error("Error:", error));
-    //     .then(res => ress.json())
-    //     .then(json => console.log(json))
-    //     .catch (err => console.log(err))
-
-    // fetch('https://sityea-web-app-yj9bs.ondigitalocean.app/', {
-    //     method: 'GET',
-    //     headers: {
-    //         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE2YTE2YTM2LWExYjMtNDMzZS1hZTA1LTgwOTU0OGM5YTcxZCIsImV4cGlyZXNJbiI6MTcyMjQ5Njg1OTE1MSwicm9sZSI6InVzZXIiLCJpYXQiOjE3MjI0MTA0NTl9.sCY5GzXPr00wwKTaq7ELFBVkzff3F7gxhu1WE-w9_-4",
-    //         "Connection": "keep-alive",
-    //         "Host": "sityea-web-app-yj9bs.ondigitalocean.app"
-    //     }
-    // })
-    //     .then(res => res.json())
-    //     .then(json => console.log(json))
-    //     .catch (err => console.log(err))
-
-    // const res = fetch('https://sityea-web-app-yj9bs.ondigitalocean.app/');
-    // if (res.ok) {
-    //   const data = res.json();
-    //   console.log(data);
-    // }
-    console.log(res)
-    console.log("done....")
-
 }
 
 function onSysCamConfig(_, data) {

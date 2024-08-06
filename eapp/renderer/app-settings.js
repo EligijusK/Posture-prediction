@@ -71,27 +71,49 @@ class AppSettings {
             .querySelectorAll("input[config-key]")
             .forEach(el => {
                 const configKey = el.getAttribute("config-key");
-                const confMulti = parseInt(el.getAttribute("config-multiplier"));
-                const confProps = configKey.split(".");
+                 const confProps = configKey.split(".");
+                if(el.getAttribute("type") === "number") {
+                    const confMulti = parseInt(el.getAttribute("config-multiplier"));
 
-                Object.defineProperty(this, configKey, {
-                    get: () => {
-                        const { object, key } = this._getProp(confProps);
-                        return object[key];
-                    },
-                    set: val => {
-                        const { object, key } = this._getProp(confProps);
-                        object[key] = val;
-                        el.value = val / confMulti;
-                        showToast(TOAST_LIST.CHANGES_SAVED);
-                        this._save();
-                    }
-                });
+                    Object.defineProperty(this, configKey, {
+                        get: () => {
+                            const {object, key} = this._getProp(confProps);
+                            return object[key];
+                        },
+                        set: val => {
+                            const {object, key} = this._getProp(confProps);
+                            object[key] = val;
+                            el.value = val / confMulti;
+                            showToast(TOAST_LIST.CHANGES_SAVED);
+                            this._save();
+                        }
+                    });
 
-                el.addEventListener("change", () => this[configKey] = parseInt(el.value) * confMulti);
+                    el.addEventListener("change", () => this[configKey] = parseInt(el.value) * confMulti);
 
-                el.value = this[configKey] / confMulti;
+                    el.value = this[configKey] / confMulti;
+                }
+                else if(el.getAttribute("type") === "text")
+                {
+                    Object.defineProperty(this, configKey, {
+                        get: () => {
+                            const { object, key } = this._getProp(confProps);
+                            return object[key];
+                        },
+                        set: val => {
+                            const { object, key } = this._getProp(confProps);
+                            el.checked = object[key] = val;
+                            showToast(TOAST_LIST.CHANGES_SAVED);
+                            this._save();
+                        }
+                    });
+
+                    el.addEventListener("change", () => this[configKey] = el.value);
+
+                    el.value = this[configKey];
+                }
             });
+
     }
 
     _getProp(confProps) {

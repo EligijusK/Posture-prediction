@@ -50,20 +50,20 @@ def make_commands(app_ver):
     #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     # Mac OS
-    with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
-        f.write('const { getMacPathModules } = require("./writable-path-utils");\n')
-        f.write('const commandRS = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_rs")];\n')
-        f.write('const commandMDL = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_mdl")];\n\n')
-        f.write('const commandNotify = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_notify")];\n\n')
-        f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
+    # with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
+    #     f.write('const { getMacPathModules } = require("./writable-path-utils");\n')
+    #     f.write('const commandRS = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_rs")];\n')
+    #     f.write('const commandMDL = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_mdl")];\n\n')
+    #     f.write('const commandNotify = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_notify")];\n\n')
+    #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     # Mac OS Test
-    # with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
-    #     f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
-    #     f.write('const commandRS = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_rs.app/Contents/MacOS/module_rs")];\n')
-    #     f.write('const commandMDL = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_mdl.app/Contents/MacOS/module_mdl")];\n\n')
-    #     f.write('const commandNotify = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_notify.app/Contents/MacOS/module_notify")];\n\n')
-    #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
+    with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
+        f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
+        f.write('const commandRS = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_rs.app/Contents/MacOS/module_rs")];\n')
+        f.write('const commandMDL = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_mdl.app/Contents/MacOS/module_mdl")];\n\n')
+        f.write('const commandNotify = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_notify.app/Contents/MacOS/module_notify")];\n\n')
+        f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     with open("%s/resources/app/eapp/main/add-reloader.js" % js_path, "w") as f:
         f.write('// This file is not used in production build.\n')

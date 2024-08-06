@@ -1,6 +1,8 @@
 {
     "calibrationSpeed": true,
     "measureEvery": 1000,
+    "syncEvery": 1000,
+    "token": "",
     "useRealsense": 0,
     "minimizeTray": true,
     "camera": 0,

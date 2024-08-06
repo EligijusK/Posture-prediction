@@ -1,17 +1,19 @@
 const NotificationList = require("./notification-list");
-
+const {ipcMain} = require("electron");
+const sendMail = require("./mailer");
 const PRED_GOOD = "good";
 const PRED_POOR = "poor";
 const PRED_GRIM = "grim";
 const PRED_NONE = "none";
 const POSTURE_MAP = Object.freeze({ [PRED_GOOD]: 0, [PRED_POOR]: 1, [PRED_GRIM]: 2, [PRED_NONE]: 3 });
-
+const UPDATE_DATA = 4;
 
 class UpdateManager {
     _takeBreak = { predictions: [], time: Date.now() };
     _badPosture = { predictions: [], time: Date.now() };
     _calibration = { isGood: true, time: Date.now() };
     _prediction = { isBusy: false, time: Date.now() };
+    _sync = { time: Date.now() };
     _view;
     _hasDevice = true;
 
@@ -20,7 +22,6 @@ class UpdateManager {
         this._ipcPython = ipcPython;
         this._cfgMan = cfgMan;
         this._historyMan = historyMan
-
         ipcPython.on("ipc_mdl_resp", this._onResponseModel.bind(this));
 
         setInterval(this._update.bind(this), 1000);
@@ -61,7 +62,7 @@ class UpdateManager {
         this._prediction.isBusy = false;
 
         const { bucketSize, bucketCount } = this._cfgMan.settings.history;
-        const { hourly, totals } = this._historyMan;
+        const { hourly, totals, sync } = this._historyMan;
         const lastBucket = hourly[bucketCount - 1];
         const lastSum = lastBucket.reduce((sum, v) => sum + v);
 
@@ -73,6 +74,7 @@ class UpdateManager {
         } else lastBucket[POSTURE_MAP[label]]++;
 
         totals[POSTURE_MAP[label]] += 1;
+        sync[POSTURE_MAP[label]] += (this._cfgMan.settings.measureEvery / 1000);
         this._prediction.time = Date.now();
 
         this._updateTakeBreak(label);
@@ -96,6 +98,23 @@ class UpdateManager {
         }
     }
 
+    async _updateSyncDate(date){
+        await this._historyMan.ResetSyncData();
+        const { hourly, totals, sync } = this._historyMan;
+        sync[UPDATE_DATA] = date;
+        this._historyMan.save();
+    }
+
+    async _updateSyncTotal(totalAdditional){
+        await this._historyMan.ResetSyncData();
+        const { hourly, totals, } = this._historyMan;
+        for (let indx = 0; indx < totals.length; indx++)
+        {
+             totals[indx] += totalAdditional[indx];
+        }
+        this._historyMan.save();
+    }
+
     _update() {
         if (!this._hasDevice) return;
 
@@ -104,12 +123,22 @@ class UpdateManager {
             ? (settings.calibrationSpeed ? 100 : settings.measureEvery)
             : settings.measureEvery;
 
+        const syncTime = settings.syncEvery;
 
         if (!this._prediction.isBusy && this._prediction.time + predictionTime < Date.now()) {
             this._prediction.isBusy = true;
             this._ipcPython.emit("ipc_mdl", {
                 prediction_frames: settings.model.predictionFrames
             });
+        }
+
+        if (this._sync.time + syncTime < Date.now())
+        {
+            this._sync.time = Date.now();
+            const { hourly, totals, sync } = this._historyMan;
+            this._win.sendMessage("syncData", { sync })
+            ipcMain.on("syncTotal", (_, contents) => this._updateSyncTotal(contents))
+            ipcMain.on("syncHistory", (_, contents) => this._updateSyncDate(contents))
         }
 
         if (this._takeBreak.time + settings.takeBreak.time < Date.now()) {
