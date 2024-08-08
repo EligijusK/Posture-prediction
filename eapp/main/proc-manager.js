@@ -63,6 +63,7 @@ class ProcessManager {
             }).on("exit", async retCode => {
                 if (retCode !== 0 && this._manCfg.settings.sendLogs)
                 {
+                    console.log(retCode);
                     await sendCrashLog();
                 }
 

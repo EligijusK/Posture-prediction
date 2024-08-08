@@ -12,10 +12,12 @@ import compileall
 import py_compile
 from app.configs.app_key import encryption_key
 from utils.files import load_json, save_json
+import numpy
 
 out_dir = "executable/SitYEA"
 root_path = os.path.realpath("./%s/bin" % out_dir)
 js_path = os.path.realpath("./%s/js" % out_dir)
+
 
 model_lst = [["full", "chk_1614151230"], ["simple", "chk_1630345558"]]
 model_dir = "/froze_models"
@@ -40,11 +42,27 @@ def make_commands(app_ver):
 
     module.exports = { commandRS, commandMDL, commandNotify };
     """
+    # with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
+    #     f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
+    #     f.write('const commandRS = [getTrueSettingsPath("./module_rs.exe")];\n')
+    #     f.write('const commandMDL = [getTrueSettingsPath("./module_mdl.exe")];\n\n')
+    #     f.write('const commandNotify = [getTrueSettingsPath("./module_notify.exe")];\n\n')
+    #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
+
+    # Mac OS
+    # with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
+    #     f.write('const { getMacPathModules } = require("./writable-path-utils");\n')
+    #     f.write('const commandRS = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_rs")];\n')
+    #     f.write('const commandMDL = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_mdl")];\n\n')
+    #     f.write('const commandNotify = [getMacPathModules("./Frameworks/modules.app/Contents/MacOS/module_notify")];\n\n')
+    #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
+
+    # Mac OS Test
     with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
         f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
-        f.write('const commandRS = [getTrueSettingsPath("./module_rs.exe")];\n')
-        f.write('const commandMDL = [getTrueSettingsPath("./module_mdl.exe")];\n\n')
-        f.write('const commandNotify = [getTrueSettingsPath("./module_notify.exe")];\n\n')
+        f.write('const commandRS = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_rs.app/Contents/MacOS/module_rs")];\n')
+        f.write('const commandMDL = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_mdl.app/Contents/MacOS/module_mdl")];\n\n')
+        f.write('const commandNotify = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/SitYEA/module_notify.app/Contents/MacOS/module_notify")];\n\n')
         f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     with open("%s/resources/app/eapp/main/add-reloader.js" % js_path, "w") as f:
@@ -53,13 +71,21 @@ def make_commands(app_ver):
     with open("%s/resources/app/eapp/main/app-version.js" % js_path, "w") as f:
         f.write('module.exports = "%s";\n' % app_ver)
 
-app_platform, app_arch = "win32", "x64"
+# Mac OS
+app_platform, app_arch = "darwin", "arm64"
+# app_platform, app_arch = "darwin", "x64"
+# app_platform, app_arch = "win32", "x64"
 app_name = "SitYEA-%s-%s" % (app_platform, app_arch)
-res = subprocess.run("node_modules/electron-packager/bin/electron-packager.js . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --icon='ico.ico' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True)
+# res = subprocess.run("npx electron-packager . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --icon='ico.ico' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True)
+res = subprocess.run("npx electron-packager . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --app-bundle-id=com.sityea.sityea --icon='./images/ico.icns' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True )
+
 
 res.check_returncode()
 
 shutil.move("executable/SitYEA/%s" % app_name, js_path)
+
+# Mac OS
+js_path = ("%s/SitYEA.app/Contents" % js_path)
 
 if os.path.exists("%s/resources/app/node_modules/tar/test" % js_path):
     shutil.rmtree("%s/resources/app/node_modules/tar/test" % js_path)
@@ -76,7 +102,7 @@ make_commands(package.version)
 JS_FILES = glob(os.path.join("%s/resources/app" % js_path, "*.js")) + glob(os.path.join("%s/resources/app/eapp/**/" % js_path, "*.js"), recursive=True)
 
 for path in JS_FILES:
-    subprocess.run("node_modules/terser/bin/terser %s --compress --mangle --toplevel -o %s" % (path, path), shell=True)
+    subprocess.run("npx terser %s --compress --mangle --toplevel -o %s" % (path, path), shell=True)
 
 os.makedirs(root_path, exist_ok=True)
 
@@ -95,6 +121,14 @@ def copy_file(path):
 
     shutil.copy(path, "%s/%s" % (root_path, path))
 
+def copy_file_path(path, out_path):
+    os.makedirs(out_path, exist_ok=True)
+    shutil.copy(path, out_path)
+
+def copy_directory(path, out_path, symlinks=True):
+    # os.makedirs(out_path, exist_ok=True)
+    shutil.copytree(path, out_path, symlinks=symlinks)
+
 def make_init(path):
     dir_name = os.path.dirname(path)
     out_dir = "%s/%s" % (root_path, dir_name)
@@ -108,8 +142,8 @@ def make_init(path):
 
     compile_file(out_file)
 
-def copy_model(model_name, model_dir):
-    in_dir = "%s/file_copies/network/models" % model_dir
+def copy_model(model_name, model_dir, pat_to_copy):
+    in_dir = ".%s/file_copies/network/models" % model_dir
 
     model_path = os.path.realpath("./%s/bin/model_%s" % (out_dir, model_name))
     os.symlink(model_path, "model_%s" % model_name)
@@ -119,13 +153,17 @@ def copy_model(model_name, model_dir):
 
     os.makedirs("%s/models" % model_path)
 
-    for file in next(os.walk(in_dir))[2]:
-        inp_path = "%s/%s" % (in_dir, file)
-        out_path = "%s/%s" % ("%s/models" % model_path, file)
-        shutil.copy(inp_path, out_path)
-        compile_file(out_path)
+#new
+    for (root, dirs, files) in os.walk(in_dir):
+        for file in files:
+            print(os.path.join(root, file))
+            inp_path = "%s/%s" % (in_dir, file)
+            out_path = "%s/%s" % ("%s/models" % model_path, file)
+            shutil.copy(inp_path, out_path)
+            compile_file(out_path)
+        break
 
-    state = torch.load("%s/%s.pth" % (model_dir, model_type), map_location="cpu")
+    state = torch.load(".%s/%s.pth" % (model_dir, model_type), map_location="cpu")
     model_weights = state["state_model"]
 
     for key in model_weights:
@@ -140,7 +178,7 @@ def copy_model(model_name, model_dir):
         f.write(encrypted)
 
     shutil.copy(
-        "%s/file_copies/network/stripped_network.py" % model_dir,
+        ".%s/file_copies/network/stripped_network.py" % model_dir,
         "%s/stripped_network.py" % model_path
     )
 
@@ -192,12 +230,16 @@ copy_file("rs/exceptions.py")
 make_init("data/__init__.py")
 copy_file("data/label_manager.py")
 copy_file("data/label_hierarchy.json")
+copy_file("data/label_hierarchy.json")
 
 make_init("configs/__init__.py")
 copy_file("configs/config.py")
 
 copy_file("ico.ico")
-copy_file("compile.py")
+# windows
+# copy_file("compile.py")
+# mac
+copy_file("compile_mac.py")
 copy_file("certificate.pfx")
 copy_file("small.ism.json")
 
@@ -210,4 +252,12 @@ shutil.copy("installer.nsi", "%s/installer.nsi" % out_dir)
 shutil.copy("SitYEA-install.ism", "%s/SitYEA-install.ism" % out_dir)
 shutil.copytree("./win_libs", "%s/win_libs" % root_path)
 
-[copy_model(name, "%s/%s" % (model_dir, mdl)) for name, mdl in model_lst]
+[copy_model(name, "%s/%s" % (model_dir, mdl), "") for name, mdl in model_lst]
+
+copy_file_path("data/label_hierarchy.json", "%s/resources/app/data/" % js_path)
+copy_file_path("%s/model_simple/model.xth" % root_path, "%s/resources/app/model/" % js_path)
+# print("%s/model_simple" % root_path)
+# copy_directory("%s/model_simple" % root_path, "%s/resources/app/model_simple/" % js_path)
+copy_directory(os.path.realpath("./dist/modules.app"), "%s/Frameworks/modules.app" % js_path)
+os.remove("%s/resources/app/node_modules/speaker" % js_path)
+copy_directory("node_modules/speaker", "%s/resources/app/node_modules/speaker" % js_path, False)
