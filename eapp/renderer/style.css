@@ -282,11 +282,11 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
 .sidebar-container .button.workspace { top: calc(200 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.about { top: calc(259 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.syncSettings {
-    top: calc(290 / var(--base-height) * var(--true-height));
-    margin-left: calc(10 / var(--base-width) * var(--true-width)); }
+    top: calc(295 / var(--base-height) * var(--true-height));
+    padding-left: calc(26 / var(--base-width) * var(--true-width)); }
 .sidebar-container .button.syncButton {
-    top: calc(320 / var(--base-height) * var(--true-height));
-    margin-left: calc(10 / var(--base-width) * var(--true-width)); }
+    top: calc(325 / var(--base-height) * var(--true-height));
+    padding-left: calc(26 / var(--base-width) * var(--true-width)); }
 .sync-settings-container .input.sync {
     display: block;
     margin-top: calc(14 / var(--base-height) * var(--true-height));
@@ -310,6 +310,23 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
     height: calc(24 / var(--base-height) * var(--true-height));
 }
 
+.sidebar-container .syncSettingsText,
+.sidebar-container .button.syncButton {
+    font-family: Montserrat;
+    font-size: 14px;
+    color: #334c6d;
+    font-weight: 500;
+}
+
+.sidebar-container .syncIcon,
+.sidebar-container .syncSettingsIcon {
+    width: 18px;
+    vertical-align: middle;
+}
+
+.sidebar-container .syncSettingsText {
+    padding-left: 9px;
+}
 
 .version-number {
     color: #8B8B8B;

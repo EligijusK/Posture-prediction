@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
     <meta charset="UTF-8">
@@ -220,8 +220,14 @@
         <div data-action="view:exercises" class="button exercises"></div>
         <div data-action="view:workspace" class="button workspace"></div>
         <div data-action="view:about" class="button about"></div>
-        <div data-action="view:sync-settings" class="button syncSettings">Settings</div>
-        <div data-action="sync:history" class="button syncButton">Synchronize</div>
+        <div data-action="view:sync-settings" class="button syncSettings">
+            <img src="../../images/settings-icon.png" class="syncSettingsIcon">
+            <text class="syncSettingsText">Settings</text>
+        </div>
+        <div data-action="sync:history" class="button syncButton">
+            <img src="../../images/sync-icon.png" class="syncIcon">
+            <text class="syncSettingsText">Synchronize</text>
+        </div>
 <!--        <div class="change-mode">-->
 <!--            <select data-action="camera:type" config-key="useRealsense">-->
 <!--                <option value="0">Integrated Camera (2D)</option>-->
