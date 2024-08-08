@@ -20,7 +20,6 @@ node_modules/
 .configs
 .history
 .access
-.env
 .venv
 package-lock.json
 env
