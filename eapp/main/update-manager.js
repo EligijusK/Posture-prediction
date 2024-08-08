@@ -24,6 +24,7 @@ class UpdateManager {
         this._historyMan = historyMan
         ipcPython.on("ipc_mdl_resp", this._onResponseModel.bind(this));
 
+        ipcMain.on("syncHistoryButton", (_, contents) => this._syncData())
         setInterval(this._update.bind(this), 1000);
     }
 
@@ -115,6 +116,15 @@ class UpdateManager {
         this._historyMan.save();
     }
 
+    _syncData()
+    {
+        this._sync.time = Date.now();
+        const { hourly, totals, sync } = this._historyMan;
+        this._win.sendMessage("syncData", { sync })
+        ipcMain.on("syncTotal", (_, contents) => this._updateSyncTotal(contents))
+        ipcMain.on("syncHistory", (_, contents) => this._updateSyncDate(contents))
+    }
+
     _update() {
         if (!this._hasDevice) return;
 
@@ -132,13 +142,13 @@ class UpdateManager {
             });
         }
 
-        if (this._sync.time + syncTime < Date.now())
+        if (settings.autoSync && this._sync.time + syncTime < Date.now())
+        {
+            this._syncData();
+        }
+        else if(!settings.autoSync)
         {
             this._sync.time = Date.now();
-            const { hourly, totals, sync } = this._historyMan;
-            this._win.sendMessage("syncData", { sync })
-            ipcMain.on("syncTotal", (_, contents) => this._updateSyncTotal(contents))
-            ipcMain.on("syncHistory", (_, contents) => this._updateSyncDate(contents))
         }
 
         if (this._takeBreak.time + settings.takeBreak.time < Date.now()) {

@@ -7,6 +7,7 @@
     "minimizeTray": true,
     "camera": 0,
     "sendLogs": true,
+    "autoSync": false,
     "model": {
         "model": "./model",
         "predictionFrames": 1

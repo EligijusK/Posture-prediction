@@ -64,6 +64,7 @@ class ConfigManager {
             minimizeTray: true,
             camera: -1,
             sendLogs: true,
+            autoSync: true,
             model: {
                 model: "./model",
                 predictionFrames: 5,

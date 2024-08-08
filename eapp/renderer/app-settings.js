@@ -1,5 +1,5 @@
 const { ipcRenderer } = require("electron");
-const showToast = require("./show-toast");
+const {showToast} = require("./show-toast");
 const TOAST_LIST = require("./toast-list");
 
 class AppSettings {

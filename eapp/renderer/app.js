@@ -3,7 +3,7 @@ const HistoryHourly = require("./history/history-hourly");
 const HistoryTotals = require("./history/history-totals");
 const HistorySync = require("./history/history-sync")
 const initAppSettings = require("./app-settings");
-const showToast = require("./show-toast");
+const  { showToast} = require("./show-toast");
 const TOAST_LIST = require("./toast-list");
 
 webFrame.setZoomFactor(1);
@@ -264,6 +264,7 @@ function createAction(element) {
             case "add-value": onChangeValue(value, +1); break;
             case "sub-value": onChangeValue(value, -1); break;
             case "reset": onResetEvent(value); break;
+            case "sync": ipcRenderer.send("syncHistoryButton"); break;
             case "camera": onCameraEvent(value); break;
             case "navigate": onNavigateEvent(value); break;
             case "window": onWindowEvent(value); break;

@@ -34,7 +34,7 @@ body[view="calibrate"][simple-model] .background { background-image: url("../../
 body[view="exercises"] .background { background-image: url("../../images/exercises.png"); }
 body[view="workspace"] .background { background-image: url("../../images/workspace.png"); }
 body[view="about"] .background { background-image: url("../../images/about.png"); }
-body[view="settings"] .background { background-image: url("../../images/exercises.png"); }
+body[view="sync-settings"] .background { background-image: url("../../images/settings-sync.png"); }
 body[view="password"] .background { background-image: url("../../images/password.png"); }
 body[view="free_entry"] .background { background-image: url("../../images/free_entry.png"); }
 body[view="mode"] .background { background-image: url("../../images/mode.png"); }
@@ -174,7 +174,7 @@ body[view="calibrate"] [view-in="calibrate"] { display: block; }
 body[view="exercises"] [view-in="exercises"] { display: block; }
 body[view="workspace"] [view-in="workspace"] { display: block; }
 body[view="about"] [view-in="about"] { display: block; }
-body[view="settings"] [view-in="settings"] { display: block; }
+body[view="sync-settings"] [view-in="sync-settings"] { display: block; }
 body[view="mode"] [view-in="mode"] { display: block; }
 
 .settings-container input,
@@ -281,16 +281,21 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
 .sidebar-container .button.exercises { top: calc(168 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.workspace { top: calc(200 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.about { top: calc(259 / var(--base-height) * var(--true-height)); }
-.sidebar-container .button.sync {
-    top: calc(390 / var(--base-height) * var(--true-height));
+.sidebar-container .button.syncSettings {
+    top: calc(290 / var(--base-height) * var(--true-height));
     margin-left: calc(10 / var(--base-width) * var(--true-width)); }
-.sidebar-container .input.sync {
-    margin-top: calc(300 / var(--base-height) * var(--true-height));
-    margin-left: calc(10 / var(--base-width) * var(--true-width));
+.sidebar-container .button.syncButton {
+    top: calc(320 / var(--base-height) * var(--true-height));
+    margin-left: calc(10 / var(--base-width) * var(--true-width)); }
+.sync-settings-container .input.sync {
+    display: block;
+    margin-top: calc(14 / var(--base-height) * var(--true-height));
+    margin-left: calc(290 / var(--base-width) * var(--true-width));
 }
-.sidebar-container .input.token {
-    margin-top: calc(10 / var(--base-height) * var(--true-height));
-    margin-left: calc(10 / var(--base-width) * var(--true-width));
+.sync-settings-container .input.token {
+    display: block;
+    margin-top: calc(65 / var(--base-height) * var(--true-height));
+    margin-left: calc(110 / var(--base-width) * var(--true-width));
 }
 
 .sidebar-container .button.dashboard,
@@ -299,7 +304,8 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
 .sidebar-container .input.sync,
 .sidebar-container .input.token,
 .sidebar-container .button.about,
-.sidebar-container .button.sync {
+.sidebar-container .button.syncSettings,
+.sidebar-container .button.syncButton {
     width: calc(220 / var(--base-width) * var(--true-width));
     height: calc(24 / var(--base-height) * var(--true-height));
 }
@@ -326,6 +332,11 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
 .switch-container.send-logs {
     left: calc(1040 / var(--base-width) * var(--true-width));
     top: calc(773 / var(--base-height) * var(--true-height));
+}
+
+.switch-container.sync-option {
+    left: calc(300 / var(--base-width) * var(--true-width));
+    top: calc(22 / var(--base-height) * var(--true-height));
 }
 
 .open-privacy {
@@ -401,19 +412,19 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
     border: none;
 }
 
-.settings-container {
+.sync-settings-container {
     position: absolute;
-    top: calc(520 / var(--base-height) * var(--true-height));
+    top: calc(220 / var(--base-height) * var(--true-height));
     left: calc(574 / var(--base-width) * var(--true-width));
     width: calc(547 / var(--base-width) * var(--true-width));
-    height: calc(188 / var(--base-height) * var(--true-height));
+    height: calc(288 / var(--base-height) * var(--true-height));
 }
 
-.settings-container textarea:focus {
+.sync-settings-container textarea:focus {
     outline-color: var(--col-good);
 }
 
-.settings-container .mail-contents {
+.sync-settings-container .mail-contents {
     height: calc(114 / var(--base-height) * var(--true-height));
     width: calc(527 / var(--base-width) * var(--true-width));
     resize: none;
@@ -424,7 +435,7 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
     border-radius: 0.4vh;
 }
 
-.settings-container .mail-submit {
+.sync-settings-container .mail-submit {
     padding: 0;
     margin: 0;
     left: calc(-1 / var(--base-width) * var(--true-width));
@@ -930,15 +941,34 @@ body:not([is-calibrating]) [view-in="calibrate"] .to-dashboard {
     height: calc(54 / var(--base-height) * var(--true-height));
 }
 
-.toast.hidden {
+.toast-error.hidden {
     top: 0;
     transform: translate(-50%) translateY(-120%);
     
 }
 
+.toast.hidden {
+    top: 0;
+    transform: translate(-50%) translateY(-120%);
+
+}
+
 .toast {
     position: absolute;
     background-color: var(--col-good);
+    color: white;
+    padding: calc(8 / var(--base-height) * var(--true-height)) calc(48 / var(--base-width) * var(--true-width));
+    border-radius: calc(6 / var(--base-height) * var(--true-height));
+    left: calc(848 / var(--base-height) * var(--true-height));
+    transform: translate(-50%);
+    top: calc(12 / var(--base-height) * var(--true-height));
+    font-weight: bold;
+    transition: top 0.5s, transform 0.5s;
+}
+
+.toast-error {
+    position: absolute;
+    background-color: var(--col-grim);
     color: white;
     padding: calc(8 / var(--base-height) * var(--true-height)) calc(48 / var(--base-width) * var(--true-width));
     border-radius: calc(6 / var(--base-height) * var(--true-height));
