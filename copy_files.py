@@ -13,7 +13,7 @@ import py_compile
 from app.configs.app_key import encryption_key
 from utils.files import load_json, save_json
 
-out_dir = "executable/SitYEA"
+out_dir = "executable/Win/SitYEA"
 root_path = os.path.realpath("./%s/bin" % out_dir)
 js_path = os.path.realpath("./%s/js" % out_dir)
 

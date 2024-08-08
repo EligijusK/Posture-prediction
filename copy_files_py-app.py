@@ -10,7 +10,7 @@ import compileall
 import py_compile
 from app.configs.app_key import encryption_key
 
-out_dir = "executable/SitYEA"
+out_dir = "executable/Mac/SitYEA"
 root_path = os.path.realpath("./%s/bin" % out_dir)
 # deps_path = os.path.realpath("./%s/dist/deps" % out_dir)
 model_path = os.path.realpath("./%s/bin/model" % out_dir)

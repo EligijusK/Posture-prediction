@@ -28,8 +28,8 @@ venv
 # SitYEA-*
 model_full
 model_simple
-executable/SitYEA/bin
-executable/SitYEA/js
+executable/Mac/SitYEA/bin
+executable/Mac/SitYEA/js
 build/
 dist/
 console.log
