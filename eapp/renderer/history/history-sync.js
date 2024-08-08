@@ -1,6 +1,6 @@
 const { ipcRenderer, remote } = require("electron");
 const { jwtDecode } = require("jwt-decode");
-const { showToastError} = require("../show-toast");
+const { showToastError, showToast} = require("../show-toast");
 const TOAST_LIST = require("../toast-list");
 const dns = require('dns').promises;
 class HistorySync {
@@ -34,6 +34,7 @@ class HistorySync {
             let isDeviceOnline = navigator.onLine;
             if (isDeviceOnline) {
 
+                let noErrors = true;
                 let tokenData = jwtDecode(this._appSettings.settings.token);
                 console.log(tokenData['id']);
                 let timeSettings = (this._appSettings.settings.measureEvery / 1000);
@@ -76,9 +77,9 @@ class HistorySync {
                         if (error === "401") {
                             showToastError(TOAST_LIST.WRONG_TOKEN)
                         } else {
-                            isNetworkError(error)
                             console.error("Error:", error);
                         }
+                        noErrors = false;
                     });
 
                 var now = new Date();
@@ -107,8 +108,6 @@ class HistorySync {
                         if (data === 201) {
                             console.log(data);
                             ipcRenderer.send("syncHistory", now.toISOString());
-                        } else {
-                            console.log("something went wrong " + data);
                         }
                     })
                     .catch(error => {
@@ -117,8 +116,11 @@ class HistorySync {
                         } else {
                             console.error("Error:", error);
                         }
+                        noErrors = false;
                     });
                 console.log(receivedData)
+                if (noErrors)
+                    showToast(TOAST_LIST.DATA_SYNCHRONIZED);
                 console.log("done....")
             }
             else

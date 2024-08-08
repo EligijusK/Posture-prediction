@@ -151,6 +151,14 @@ function changeView(view) {
     const prevView = document.body.getAttribute("view");
     if (prevView === view) return;
 
+    if(view === "sync-settings") {
+        document.getElementById("syncSettingsIcon").src="../../images/settings-icon-selected.png";
+        document.getElementById("syncSettingsText").style.color="#0e9cf0";
+    }
+    else {
+        document.getElementById("syncSettingsIcon").src="../../images/settings-icon.png";
+        document.getElementById("syncSettingsText").style.color="#334c6d";
+    }
     document.body.setAttribute("view", view);
 
     if (view === "calibrate") ipcRenderer.on("comsData", updateCanvas);

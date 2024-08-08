@@ -3,6 +3,7 @@ const TOAST_LIST = {
     MESSAGE_SENT: "Your message has been sent successfully!",
     DO_NOT_SPAM: "Please wait, before submitting new feedback.",
     ADD_TOKEN: "Please copy token from website and add it in settings.",
+    DATA_SYNCHRONIZED: "Your data has been synchronized successfully!",
     WRONG_TOKEN: "Please add correct token.",
     NO_INTERNET: "Please connect to internet"
 };
