@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP="SitYEA"
-APP_PATH="./js/$APP.app"
+APP_PATH="./SitYEA/js/$APP.app"
 APP_KEY="Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)"
 
 PARENT_PLIST="./entitlements.camera.mac.plist"

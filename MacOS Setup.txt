@@ -1,0 +1,12 @@
+pyinstaller module_rs.spec
+
+python ./copy_files_mac.py
+
+sh codeSignElectronApp.sh
+
+
+xcrun notarytool submit ./js/sityea.zip --keychain-profile "SitYEA" --wait
+
+xcrun notarytool submit /Users/eligijus/Desktop/"SitYEA - Installer".dmg  --keychain-profile "SitYEA" --wait
+
+xcrun stapler staple -v /Users/eligijus/Desktop/"SitYEA - Installer".dmg
