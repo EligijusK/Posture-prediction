@@ -76,6 +76,7 @@ rm -f tempFileExeApp
 
 #codesign -s "$APP_KEY" --verbose -f --deep --options=runtime --entitlements "$PARENT_PLIST" "$APP_EXECUTABLE_PATH"
 codesign -s "$APP_KEY" --verbose -f --deep --options=runtime --entitlements "$PARENT_PLIST_NO_CAMERA" "$APP_PYTHON_EXECUTABLE_PATH"
+
 echo $count
 
 

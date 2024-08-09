@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APP="SitYEA"
-APP_PATH="./js/$APP.app"
+APP_PATH="./SitYEA/js/$APP.app"
 APP_KEY="Developer ID Application: Eligijus Kiudys (3Z24U3RF5U)"
 
 PARENT_PLIST="./entitlements.camera.mac.plist"
@@ -9,7 +9,7 @@ PARENT_PLIST_INHERIT="./entitlements.mac.inherit.plist"
 FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
 NODE_FRAMEWORKS_PATH="$APP_PATH/Contents/Resources/app"
 
-./codesignPyinstaller.sh "modules" $FRAMEWORKS_PATH "true"
+sh ./codesignPyinstaller.sh "modules" $FRAMEWORKS_PATH "true"
 
 find "$FRAMEWORKS_PATH" -maxdepth 1 -type d ! -name "module*.app" -print0 >> tmpFile
 find "$NODE_FRAMEWORKS_PATH" -type f -name "*.node" -print0 >> tmpNodeFileExe
