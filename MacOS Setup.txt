@@ -6,6 +6,8 @@ sh codeSignElectronApp.sh
 
 /usr/bin/ditto -c -k --keepParent "./SitYEA/js/SitYea.app" "./SitYEA/js/SitYEA.zip"
 
+xcrun notarytool submit ./SitYEA/js/SitYEA.zip  --keychain-profile "SitYEA" --wait
+
 xcrun notarytool submit /Users/eligijus/Desktop/"SitYEA - Installer".dmg  --keychain-profile "SitYEA" --wait
 
 xcrun stapler staple -v /Users/eligijus/Desktop/"SitYEA - Installer".dmg

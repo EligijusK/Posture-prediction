@@ -75,7 +75,7 @@ class UpdateManager {
         } else lastBucket[POSTURE_MAP[label]]++;
 
         totals[POSTURE_MAP[label]] += 1;
-        sync[POSTURE_MAP[label]] += (this._cfgMan.settings.measureEvery / 1000);
+        sync[POSTURE_MAP[label]] += (this._cfgMan.settings.measureEvery / 1000) / 60;
         this._prediction.time = Date.now();
 
         this._updateTakeBreak(label);

@@ -58,7 +58,7 @@ class ConfigManager {
         return {
             calibrationSpeed: true,
             measureEvery: 10 * 1000,
-            syncEvery: 10 * 1000,
+            syncEvery: 60 * 1000,
             token: "",
             useRealsense: -1,
             minimizeTray: true,
