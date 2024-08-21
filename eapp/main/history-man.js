@@ -20,7 +20,6 @@ class HistoryManager {
         [this.sync, this.totals, ...this.hourly].forEach(arr => arr.fill(0));
         this.sync.push("date");
         event.reply("historyUpdate", { hourly: this.hourly, totals: this.totals, sync: this.sync });
-
         await this.save();
     }
 

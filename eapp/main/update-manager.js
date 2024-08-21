@@ -25,6 +25,8 @@ class UpdateManager {
         ipcPython.on("ipc_mdl_resp", this._onResponseModel.bind(this));
 
         ipcMain.on("syncHistoryButton", (_, contents) => this._syncData())
+        ipcMain.on("syncTotal", (_, contents) => this._updateSyncTotal(contents))
+        ipcMain.on("syncHistory", (_, contents) => this._updateSyncDate(contents))
         setInterval(this._update.bind(this), 1000);
     }
 
@@ -75,7 +77,7 @@ class UpdateManager {
         } else lastBucket[POSTURE_MAP[label]]++;
 
         totals[POSTURE_MAP[label]] += 1;
-        sync[POSTURE_MAP[label]] += (this._cfgMan.settings.measureEvery / 1000) / 60;
+        sync[POSTURE_MAP[label]] += this._cfgMan.settings.measureEvery / 1000;
         this._prediction.time = Date.now();
 
         this._updateTakeBreak(label);
@@ -100,9 +102,9 @@ class UpdateManager {
     }
 
     async _updateSyncDate(date){
-        await this._historyMan.ResetSyncData();
         const { hourly, totals, sync } = this._historyMan;
-        sync[UPDATE_DATA] = date;
+        this._historyMan.sync = sync.slice(0, 4).map((a) => Math.trunc(a / 60) > 0 ? a - (Math.trunc(a / 60) * 60) : a);
+        this._historyMan.sync.push(date)
         this._historyMan.save();
     }
 
@@ -121,8 +123,6 @@ class UpdateManager {
         this._sync.time = Date.now();
         const { hourly, totals, sync } = this._historyMan;
         this._win.sendMessage("syncData", { sync })
-        ipcMain.on("syncTotal", (_, contents) => this._updateSyncTotal(contents))
-        ipcMain.on("syncHistory", (_, contents) => this._updateSyncDate(contents))
     }
 
     _update() {

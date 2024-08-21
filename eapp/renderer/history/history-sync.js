@@ -85,10 +85,10 @@ class HistorySync {
                 var now = new Date();
                 const data = JSON.stringify({
                     day: now.toISOString(),
-                    correct: receivedData[0],
-                    hunched: receivedData[1],
-                    incorrect: receivedData[2],
-                    away: receivedData[3]
+                    correct: Math.trunc(receivedData[0] / 60),
+                    hunched: Math.trunc(receivedData[1] / 60),
+                    incorrect: Math.trunc(receivedData[2] / 60),
+                    away: Math.trunc(receivedData[3] / 60)
                 });
 
                 let request = fetch('https://sityea-back-app-f9omq.ondigitalocean.app/result/create', {
@@ -115,6 +115,7 @@ class HistorySync {
                             showToastError(TOAST_LIST.WRONG_TOKEN)
                         } else {
                             console.error("Error:", error);
+                            showToastError(error)
                         }
                         noErrors = false;
                     });
