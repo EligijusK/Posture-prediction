@@ -146,6 +146,10 @@ def copy_model(model_name, model_dir, pat_to_copy):
     in_dir = ".%s/file_copies/network/models" % model_dir
 
     model_path = os.path.realpath("./%s/bin/model_%s" % (out_dir, model_name))
+
+    if os.path.exists("model_%s" % model_name) and os.path.islink("model_%s" % model_name):
+        os.unlink("model_%s" % model_name)
+
     os.symlink(model_path, "model_%s" % model_name)
     if os.path.exists(model_path):
         shutil.rmtree(model_path)
