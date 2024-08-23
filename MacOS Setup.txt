@@ -11,3 +11,6 @@ xcrun notarytool submit ./SitYEA/js/SitYEA.zip  --keychain-profile "SitYEA" --wa
 xcrun notarytool submit /Users/eligijus/Desktop/"SitYEA - Installer".dmg  --keychain-profile "SitYEA" --wait
 
 xcrun stapler staple -v /Users/eligijus/Desktop/"SitYEA - Installer".dmg
+
+
+xcrun notarytool log ec687223-d29d-45d2-9b02-beac2beff1eb --keychain-profile "SitYEA"
