@@ -18,7 +18,7 @@ root_path = os.path.realpath("./%s/bin" % out_dir)
 js_path = os.path.realpath("./%s/js" % out_dir)
 
 model_lst = [["full", "chk_1614151230"], ["simple", "chk_1630345558"]]
-model_dir = "/froze_models"
+model_dir = "./froze_models"
 model_type = "model_best_train"
 
 if os.path.exists("model_full"):
@@ -111,6 +111,7 @@ def make_init(path):
 def copy_model(model_name, model_dir):
     in_dir = "%s/file_copies/network/models" % model_dir
 
+    print(in_dir)
     model_path = os.path.realpath("./%s/bin/model_%s" % (out_dir, model_name))
 
     if os.path.exists("model_%s" % model_name) and os.path.islink("model_%s" % model_name):
@@ -132,7 +133,7 @@ def copy_model(model_name, model_dir):
             compile_file(out_path)
         break
 
-    state = torch.load(".%s/%s.pth" % (model_dir, model_type), map_location="cpu")
+    state = torch.load("%s/%s.pth" % (model_dir, model_type), map_location="cpu")
     model_weights = state["state_model"]
 
     for key in model_weights:
@@ -147,7 +148,7 @@ def copy_model(model_name, model_dir):
         f.write(encrypted)
 
     shutil.copy(
-        ".%s/file_copies/network/stripped_network.py" % model_dir,
+        "%s/file_copies/network/stripped_network.py" % model_dir,
         "%s/stripped_network.py" % model_path
     )
 
