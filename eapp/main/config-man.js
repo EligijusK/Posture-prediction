@@ -66,7 +66,8 @@ class ConfigManager {
             sendLogs: true,
             autoSync: false,
             model: {
-                model: "./model",
+                model: "./model_simple",
+                modelMac: "./model",
                 predictionFrames: 5,
             },
             calibration: {

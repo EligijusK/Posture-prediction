@@ -13,7 +13,7 @@ from itertools import chain as iterchain
 from zipfile import ZipFile, ZIP_DEFLATED
 from distutils.sysconfig import get_python_lib
 
-dir_winsdk = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64"
+dir_winsdk = "C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64"
 ishield_build = "C:/Program Files (x86)/InstallShield/2020/System/IsCmdBld.exe"
 sign_tool = "%s/signtool.exe" % dir_winsdk
 makeappx = "%s/makeappx.exe" % dir_winsdk
@@ -136,7 +136,7 @@ setup(
     executables=[e for e in executables.values()]
 )
 
-[sign_exe("python_modules/%s" % p if copy_files and not archive_files else p) for p in executables.keys()]
+# [sign_exe("python_modules/%s" % p if copy_files and not archive_files else p) for p in executables.keys()]
 
 if archive_files:
     print("Compiled python binaries, packaging python into archive...")
@@ -239,7 +239,7 @@ copy_dir("../bin/Assets", "%s/Assets" % build_dir)
 
 os.chdir(cwd)
 
-sign_exe("SitYEA.exe")
+# sign_exe("SitYEA.exe")
 
 if os.path.exists("../MsixPackage"):
     shutil.rmtree("../MsixPackage")
@@ -271,4 +271,4 @@ with open(os.path.join(os.path.realpath("%s/AppxManifest.xml" % build_dir)), "w"
 subprocess.run(
     "\"%s\" pack /v /h SHA256 /p ../MsixPackage/SitYEA-install_%s_x64.msix /d ../build" % (makeappx, build_version), shell=True).check_returncode()
 
-sign_exe("../MsixPackage/SitYEA-install_%s_x64.msix" % build_version)
+# sign_exe("../MsixPackage/SitYEA-install_%s_x64.msix" % build_version)

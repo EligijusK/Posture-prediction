@@ -42,9 +42,9 @@ def make_commands(app_ver):
     """
     with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
         f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
-        f.write('const commandRS = [getTrueSettingsPath("./module_rs.exe")];\n')
-        f.write('const commandMDL = [getTrueSettingsPath("./module_mdl.exe")];\n\n')
-        f.write('const commandNotify = [getTrueSettingsPath("./module_notify.exe")];\n\n')
+        f.write('const commandRS = [getTrueSettingsPath("./python_modules/module_rs.exe")];\n')
+        f.write('const commandMDL = [getTrueSettingsPath("./python_modules/module_mdl.exe")];\n\n')
+        f.write('const commandNotify = [getTrueSettingsPath("./python_modules/module_notify.exe")];\n\n')
         f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     with open("%s/resources/app/eapp/main/add-reloader.js" % js_path, "w") as f:
@@ -55,7 +55,7 @@ def make_commands(app_ver):
 
 app_platform, app_arch = "win32", "x64"
 app_name = "SitYEA-%s-%s" % (app_platform, app_arch)
-res = subprocess.run("node_modules/electron-packager/bin/electron-packager.js . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --icon='ico.ico' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True)
+res = subprocess.run("npx electron-packager . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --icon='ico.ico' --ignore=\"^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$\"" % (app_platform, app_arch), shell=True)
 
 res.check_returncode()
 
@@ -112,20 +112,27 @@ def copy_model(model_name, model_dir):
     in_dir = "%s/file_copies/network/models" % model_dir
 
     model_path = os.path.realpath("./%s/bin/model_%s" % (out_dir, model_name))
-    os.symlink(model_path, "model_%s" % model_name)
+
+    if os.path.exists("model_%s" % model_name) and os.path.islink("model_%s" % model_name):
+        os.unlink("model_%s" % model_name)
+
+    os.symlink(model_path, "model_%s" % model_name, target_is_directory=True)
     if os.path.exists(model_path):
         shutil.rmtree(model_path)
     os.makedirs(model_path, exist_ok=True)
 
     os.makedirs("%s/models" % model_path)
 
-    for file in next(os.walk(in_dir))[2]:
-        inp_path = "%s/%s" % (in_dir, file)
-        out_path = "%s/%s" % ("%s/models" % model_path, file)
-        shutil.copy(inp_path, out_path)
-        compile_file(out_path)
+    for (root, dirs, files) in os.walk(in_dir):
+        for file in files:
+            print(os.path.join(root, file))
+            inp_path = "%s/%s" % (in_dir, file)
+            out_path = "%s/%s" % ("%s/models" % model_path, file)
+            shutil.copy(inp_path, out_path)
+            compile_file(out_path)
+        break
 
-    state = torch.load("%s/%s.pth" % (model_dir, model_type), map_location="cpu")
+    state = torch.load(".%s/%s.pth" % (model_dir, model_type), map_location="cpu")
     model_weights = state["state_model"]
 
     for key in model_weights:
@@ -140,7 +147,7 @@ def copy_model(model_name, model_dir):
         f.write(encrypted)
 
     shutil.copy(
-        "%s/file_copies/network/stripped_network.py" % model_dir,
+        ".%s/file_copies/network/stripped_network.py" % model_dir,
         "%s/stripped_network.py" % model_path
     )
 
@@ -164,6 +171,7 @@ def copy_model(model_name, model_dir):
 
     compile_file(out_file_init)
     compile_file(out_file_models)
+
 
 
 copy_file("package.json")
