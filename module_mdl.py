@@ -246,7 +246,7 @@ async def main():
 
 
     path_model = fetch_string(sys.stdin.buffer)
-    path_checkpoint = "%s/model.xth" % path_model
+    path_checkpoint = "%s\model.xth" % path_model
     str_sock = "http://127.0.0.1:%i" % port
 
     print("Path RAM: '%s'" % path_ram[0])
