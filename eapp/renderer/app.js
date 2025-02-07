@@ -159,6 +159,16 @@ function changeView(view) {
         document.getElementById("syncSettingsIcon").src="../../images/settings-icon.png";
         document.getElementById("syncSettingsText").style.color="#334c6d";
     }
+
+    if(view === "about") {
+        document.getElementById("aboutPageIcon").src="../../images/about-icon-selected.png";
+        document.getElementById("aboutText").style.color="#0e9cf0";
+    }
+    else
+    {
+        document.getElementById("aboutPageIcon").src="../../images/about-icon.png";
+        document.getElementById("aboutText").style.color="#334c6d";
+    }
     document.body.setAttribute("view", view);
 
     if (view === "calibrate") ipcRenderer.on("comsData", updateCanvas);
