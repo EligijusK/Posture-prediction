@@ -67,6 +67,7 @@ class ConfigManager {
             autoSync: false,
             model: {
                 model: "./model_simple",
+                modelCompiled: "./python_modules/model_simple",
                 modelMac: "./model",
                 predictionFrames: 5,
             },

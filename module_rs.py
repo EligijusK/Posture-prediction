@@ -93,7 +93,7 @@ class ModuleWebcam(BaseModuleCamera):
             print("use captured vide!!!!!!!!1", flush=True)
             self.capture = cv2.VideoCapture()
 
-        self.capture.open(device_index, cv2.CAP_DSHOW)
+        self.capture.open(device_index)
         self.capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
         print("Video Configuration", flush=True)
@@ -227,7 +227,7 @@ async def main():
         sys.stdout.flush()
 
         rs.capture.release()
-        rs.capture.open(rs.local_index, cv2.CAP_DSHOW) # if cam_idx < 0 else cam_idx
+        rs.capture.open(rs.local_index) # if cam_idx < 0 else cam_idx
         # rs = ModuleWebcam(coms, cam_idx)
         # sys.stdout.flush()
 
@@ -256,7 +256,7 @@ async def main():
                         rs = ModuleWebcam(coms, camera_list[0]["camera_index"]) #  if cam_idx < 0 else cam_idx, override_device
                     else:
                         rs.capture.release()
-                        rs.capture.open(camera_list[0]["camera_index"], cv2.CAP_DSHOW) # if cam_idx < 0 else cam_idx
+                        rs.capture.open(camera_list[0]["camera_index"]) # if cam_idx < 0 else cam_idx
 
                     if rs.camera_count is not None and rs.camera_count == 0:
                         rs.camera_count = len(camera_list)

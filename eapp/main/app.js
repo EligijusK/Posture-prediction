@@ -221,7 +221,7 @@ async function initPostureEvaluator(win) {
             ipc: ipcPython,
             port: portPython,
             maxFrames: manCfg.settings.model.predictionFrames,
-            pathModel: getTrueSettingsPath(manCfg.settings.model.model),
+            pathModel: getTrueSettingsPath(manCfg.settings.model.modelCompiled),
             pathRam: getTrueSettingsPath(PATH_RAM),
             pathRam2: getTrueSettingsPath(PATH_RAM_2),
             width: rsDims.width,
