@@ -16,7 +16,7 @@ class AppWindow {
             maxHeight: height,
             resizable: false,
             minimizable: true,
-            title: "SitYEA",
+            title: "ChainHealth AI",
             icon,
             webPreferences: { nodeIntegration: true, contextIsolation: false, webviewTag: true }
         });

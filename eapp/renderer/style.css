@@ -280,7 +280,9 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
 .sidebar-container .button.dashboard { top: calc(101 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.exercises { top: calc(168 / var(--base-height) * var(--true-height)); }
 .sidebar-container .button.workspace { top: calc(200 / var(--base-height) * var(--true-height)); }
-.sidebar-container .button.about { top: calc(259 / var(--base-height) * var(--true-height)); }
+.sidebar-container .button.about {
+    top: calc(265 / var(--base-height) * var(--true-height));
+    padding-left: calc(26 / var(--base-width) * var(--true-width)); }
 .sidebar-container .button.syncSettings {
     top: calc(295 / var(--base-height) * var(--true-height));
     padding-left: calc(26 / var(--base-width) * var(--true-width)); }
@@ -310,6 +312,7 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
     height: calc(24 / var(--base-height) * var(--true-height));
 }
 
+.sidebar-container .aboutText,
 .sidebar-container .syncSettingsText,
 .sidebar-container .button.syncButton {
     font-family: Montserrat;
@@ -318,12 +321,14 @@ body[view="calibrate"][is-calibrating] .sidebar-container { display: none; }
     font-weight: 500;
 }
 
+.sidebar-container .aboutPageIcon,
 .sidebar-container .syncIcon,
 .sidebar-container .syncSettingsIcon {
     width: 18px;
     vertical-align: middle;
 }
 
+.sidebar-container .aboutText,
 .sidebar-container .syncSettingsText {
     padding-left: 9px;
 }

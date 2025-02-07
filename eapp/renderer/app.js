@@ -234,7 +234,7 @@ function createAction(element) {
     function onNavigateEvent(value) {
         switch (value) {
             case "order_rs": ipcRenderer.send("openExternal", "https://sityea.io/3d"); break;
-            case "sityea": ipcRenderer.send("openExternal", "https://sityea.io"); break;
+            case "ChainHealthAI": ipcRenderer.send("openExternal", "https://chainhealth.ai"); break;
             case "privacy": ipcRenderer.send("openExternal", "https://www.sityea.io/privacy-policy/"); break;
             case "terms": ipcRenderer.send("openExternal", "https://www.sityea.io/terms-and-conditions"); break;
             default: console.warn(`Unknown action '${action}': '${value}'`); break;

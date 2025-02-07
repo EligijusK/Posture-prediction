@@ -34,7 +34,7 @@ class Notification {
             title,
             message,
             icon: getAssetPath(icon),
-            appID: "SitYEA"
+            appID: "ChainHealth AI"
         };
     }
 

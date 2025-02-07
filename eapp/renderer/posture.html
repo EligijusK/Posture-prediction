@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SitYEA</title>
+    <title>ChainHealth AI</title>
     <link rel="stylesheet" href="montserrat/montserrat.css" />
     <link rel="stylesheet" href="style.css" />
     <link rel="preload" as="image" href="../../images/dashboard.png" as="image" />
@@ -87,14 +87,14 @@
 <!--    </div>-->
     <div view-in="about" class="fullscreen-container">
         <div class="version-number">Version: <span data-static="app_ver">#version</span></div>
-        <div class="button open-homepage" data-action="navigate:sityea"></div>
+        <div class="button open-homepage" data-action="navigate:ChainHealthAI"></div>
         <div class="button open-privacy" data-action="navigate:privacy"></div>
         <div class="button open-terms" data-action="navigate:terms"></div>
         <div class="button open-console-log" data-action="open:console.log"></div>
         <div class="about-container">
             <form data-form="send-mail">
                 <textarea name="mail-contents" class="mail-contents"
-                    placeholder="What do you think of SiytYEA?"></textarea>
+                    placeholder="What do you think of ChainHealth AI?"></textarea>
                 <input class="mail-submit button" value="" type="submit" />
             </form>
         </div>
@@ -120,7 +120,7 @@
                     </span>
                 </span>
             </label>
-            <div class="button open-homepage" data-action="navigate:sityea"></div>
+            <div class="button open-homepage" data-action="navigate:ChainHealthAI"></div>
             <input config-type="text" class="input token" config-key="token" type="text" value="labas" />
             <input config-type="number" class="input sync" config-multiplier="1000" config-key="syncEvery" type="number" value="1" min="1" max="999" maxlength="3" />
 <!--            <form data-form="send-mail">-->
@@ -217,9 +217,10 @@
     <div class="sidebar-container fullscreen-container">
         <div data-action="view:dashboard" class="button dashboard"></div>
         <div data-action="view:calibrate" class="button calibrate"></div>
-        <div data-action="view:exercises" class="button exercises"></div>
-        <div data-action="view:workspace" class="button workspace"></div>
-        <div data-action="view:about" class="button about"></div>
+        <div data-action="view:about" class="button about">
+            <img src="../../images/about-icon.png" class="aboutPageIcon" id="aboutPageIcon">
+            <text class="aboutText" id="aboutText" >About ChainHealth AI</text>
+        </div>
         <div data-action="view:sync-settings" class="button syncSettings">
             <img src="../../images/settings-icon.png" class="syncSettingsIcon" id="syncSettingsIcon">
             <text class="syncSettingsText" id="syncSettingsText" >Settings</text>
@@ -237,7 +238,7 @@
     </div>
     <div class="centered loading-indicator fullscreen-container">
         <div data-proc-state="proc_init">
-            <div class="title">SitYEA is loading...</div>
+            <div class="title">ChainHealth AI is loading...</div>
             <div class="progress-bar">
                 <div class="progress"></div>
             </div>
