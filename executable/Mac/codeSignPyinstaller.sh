@@ -2,6 +2,7 @@
 
 # Name of your app.
 APP_PATH="$2/$1.app"
+echo "$APP_PATH"
 # The path of your app to sign.
 APP_PATH_COMPONENTS="$APP_PATH/Contents/Resources"
 FRAMEWORKS_PATH="$APP_PATH/Contents/Frameworks"
@@ -38,19 +39,19 @@ echo $PARENT_PLIST
 array=()
 arrayExe=()
 
-find $APP_PATH_COMPONENTS -type f -name "*.so" -print0 >> tmpfile
-find $APP_PATH_COMPONENTS -type f -name "*.o" -print0 >> tmpfile
-find $APP_PATH_COMPONENTS -type f -name "*.dylib" -print0 >> tmpfile
-find $APP_PATH_COMPONENTS -type f -name "*.libitclstub" -print0 >> tmpfile
-find $APP_PATH_COMPONENTS -perm +0111 -type f ! -name "*.sh" ! -name "*.so" ! -name "*.dylib" -print0 >> tempFileExe
+find "$APP_PATH_COMPONENTS" -type f -name "*.so" -print0 >> tmpfile
+find "$APP_PATH_COMPONENTS" -type f -name "*.o" -print0 >> tmpfile
+find "$APP_PATH_COMPONENTS" -type f -name "*.dylib" -print0 >> tmpfile
+find "$APP_PATH_COMPONENTS" -type f -name "*.libitclstub" -print0 >> tmpfile
+find "$APP_PATH_COMPONENTS" -perm +0111 -type f ! -name "*.sh" ! -name "*.so" ! -name "*.dylib" -print0 >> tempFileExe
 
-find $FRAMEWORKS_PATH -type f -name "*.so" -print0 >> tmpfile
-find $FRAMEWORKS_PATH -type f -name "*.o" -print0 >> tmpfile
-find $FRAMEWORKS_PATH -type f -name "*.dylib" -print0 >> tmpfile
-find $FRAMEWORKS_PATH -type f -name "*.libitclstub" -print0 >> tmpfile
-find $FRAMEWORKS_PATH -perm +0111 -type f ! -name "*.sh" ! -name "*.so" ! -name "*.dylib" -print0 >> tempFileExe
+find "$FRAMEWORKS_PATH" -type f -name "*.so" -print0 >> tmpfile
+find "$FRAMEWORKS_PATH" -type f -name "*.o" -print0 >> tmpfile
+find "$FRAMEWORKS_PATH" -type f -name "*.dylib" -print0 >> tmpfile
+find "$FRAMEWORKS_PATH" -type f -name "*.libitclstub" -print0 >> tmpfile
+find "$FRAMEWORKS_PATH" -perm +0111 -type f ! -name "*.sh" ! -name "*.so" ! -name "*.dylib" -print0 >> tempFileExe
 
-find $APP_EXECUTABLE_PATHS -type f ! -name "python" -print0 >> tempFileExeApp
+find "$APP_EXECUTABLE_PATHS" -type f ! -name "python" -print0 >> tempFileExeApp
 
 #codesign -s "$APP_KEY" -f --verbose --options=runtime --entitlements "$PARENT_PLIST" "$APP_RS_EXECUTABLE_PATH"
 #codesign -s "$APP_KEY" -f --verbose --options=runtime "$APP_MDL_EXECUTABLE_PATH"
