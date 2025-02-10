@@ -216,7 +216,7 @@ copy_file("Assets/SitYEA-MedTile.png")
 copy_file("Assets/StoreLogo.png")
 
 shutil.copy("installer.nsi", "%s/installer.nsi" % out_dir)
-shutil.copy("SitYEA-install.ism", "%s/SitYEA-install.ism" % out_dir)
+shutil.copy("ChainHealth AI-install.ism", "%s/ChainHealth AI-install.ism" % out_dir)
 shutil.copytree("./win_libs", "%s/win_libs" % root_path)
 
 [copy_model(name, "%s/%s" % (model_dir, mdl)) for name, mdl in model_lst]

@@ -14,7 +14,7 @@ from app.configs.app_key import encryption_key
 from utils.files import load_json, save_json
 import numpy
 
-out_dir = "executable/Mac/SitYEA"
+out_dir = "executable/Mac/ChainHealth AI/"
 root_path = os.path.realpath("./%s/bin" % out_dir)
 js_path = os.path.realpath("./%s/js" % out_dir)
 
@@ -60,9 +60,9 @@ def make_commands(app_ver):
     # # Mac OS Test
     # with open("%s/resources/app/eapp/main/proc-commands.js" % js_path, "w") as f:
     #     f.write('const { getTrueSettingsPath } = require("./writable-path-utils");\n')
-    #     f.write('const commandRS = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/SitYEA/module_rs.app/Contents/MacOS/module_rs")];\n')
-    #     f.write('const commandMDL = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/SitYEA/module_mdl.app/Contents/MacOS/module_mdl")];\n\n')
-    #     f.write('const commandNotify = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/SitYEA/module_notify.app/Contents/MacOS/module_notify")];\n\n')
+    #     f.write('const commandRS = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/ChainHealthAI/module_rs.app/Contents/MacOS/module_rs")];\n')
+    #     f.write('const commandMDL = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/ChainHealthAI/module_mdl.app/Contents/MacOS/module_mdl")];\n\n')
+    #     f.write('const commandNotify = [getTrueSettingsPath("/Users/eligijus/Desktop/Projektai/Posture-prediction/executable/Mac/ChainHealthAI/module_notify.app/Contents/MacOS/module_notify")];\n\n')
     #     f.write('module.exports = { commandRS, commandMDL, commandNotify };\n')
 
     with open("%s/resources/app/eapp/main/add-reloader.js" % js_path, "w") as f:
@@ -75,23 +75,23 @@ def make_commands(app_ver):
 app_platform, app_arch = "darwin", "arm64"
 # app_platform, app_arch = "darwin", "x64"
 # app_platform, app_arch = "win32", "x64"
-app_name = "SitYEA-%s-%s" % (app_platform, app_arch)
+app_name = "ChainHealth AI-%s-%s" % (app_platform, app_arch)
 # res = subprocess.run("npx electron-packager . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --icon='ico.ico' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True)
-res = subprocess.run("npx electron-packager . SitYEA --derefSymlinks=false --out=executable/SitYEA --appCopyright SitYEA --overwrite --prune=true --platform=%s --arch=%s --app-bundle-id=com.sityea.sityea --icon='./images/ico.icns' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True )
+res = subprocess.run("npx electron-packager . 'ChainHealth AI' --derefSymlinks=false --out='executable/ChainHealth AI' --appCopyright 'ChainHealth AI' --overwrite --prune=true --platform=%s --arch=%s --app-bundle-id=com.sityea.sityea --icon='./images/ico.icns' --ignore='^((?!(notification.wav|node_modules|images|eapp|package|\\.(js|css|html)$)).)+$'" % (app_platform, app_arch), shell=True )
 
 
 res.check_returncode()
 
-shutil.move("executable/SitYEA/%s" % app_name, js_path)
+shutil.move("executable/ChainHealth AI/%s" % app_name, js_path)
 
 # Mac OS
-js_path = ("%s/SitYEA.app/Contents" % js_path)
+js_path = ('%s/ChainHealth AI.app/Contents' % js_path)
 
 if os.path.exists("%s/resources/app/node_modules/tar/test" % js_path):
     shutil.rmtree("%s/resources/app/node_modules/tar/test" % js_path)
 
 package = load_json("%s/resources/app/package.json" % js_path)
-package.homepage = "http://sityea.com"
+package.homepage = "http://chainhealth.ai"
 package.name = "com.sityea"
 del package["repository"]
 del package["scripts"]
@@ -102,7 +102,8 @@ make_commands(package.version)
 JS_FILES = glob(os.path.join("%s/resources/app" % js_path, "*.js")) + glob(os.path.join("%s/resources/app/eapp/**/" % js_path, "*.js"), recursive=True)
 
 for path in JS_FILES:
-    subprocess.run("npx terser %s --compress --mangle --toplevel -o %s" % (path, path), shell=True)
+    # print("npx terser %s --compress --mangle --toplevel -o %s" % (path, path))
+    subprocess.run("npx terser '%s' --compress --mangle --toplevel -o '%s'" % (path, path), shell=True)
 
 os.makedirs(root_path, exist_ok=True)
 
@@ -253,7 +254,7 @@ copy_file("Assets/SitYEA-MedTile.png")
 copy_file("Assets/StoreLogo.png")
 
 shutil.copy("installer.nsi", "%s/installer.nsi" % out_dir)
-shutil.copy("SitYEA-install.ism", "%s/SitYEA-install.ism" % out_dir)
+shutil.copy("ChainHealth AI-install.ism", "%s/ChainHealth AI-install.ism" % out_dir)
 shutil.copytree("./win_libs", "%s/win_libs" % root_path)
 
 [copy_model(name, "%s/%s" % (model_dir, mdl), "") for name, mdl in model_lst]

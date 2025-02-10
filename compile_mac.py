@@ -15,7 +15,7 @@ from distutils.sysconfig import get_python_lib
 cert_pass = None
 archive_files, copy_files = False, True # last one was false
 build_version = load_json("package.json")["version"] + ".0"
-app_name = "SitYEA.app"
+app_name = "ChainHealth AI.app"
 root_dir_mdl = os.path.realpath(os.path.dirname(__file__))
 build_dir = os.path.abspath("%s/../build" % root_dir_mdl)
 build_dir_mdl = os.path.abspath("%s/../build" % root_dir_mdl)

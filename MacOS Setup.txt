@@ -4,13 +4,13 @@ python ./copy_files_mac.py
 
 sh codeSignElectronApp.sh
 
-/usr/bin/ditto -c -k --keepParent "./SitYEA/js/SitYea.app" "./SitYEA/js/SitYEA.zip"
+/usr/bin/ditto -c -k --keepParent "./ChainHealthAI/js/ChainHealthAI.app" "./ChainHealthAI/js/ChainHealthAI.zip"
 
-xcrun notarytool submit ./SitYEA/js/SitYEA.zip  --keychain-profile "SitYEA" --wait
+xcrun notarytool submit ./ChainHealthAI/js/ChainHealthAI.zip  --keychain-profile "SitYEA" --wait
 
-xcrun notarytool submit /Users/eligijus/Desktop/"SitYEA - Installer".dmg  --keychain-profile "SitYEA" --wait
+xcrun notarytool submit /Users/eligijus/Desktop/"ChainHealth AI - Installer".dmg  --keychain-profile "SitYEA" --wait
 
-xcrun stapler staple -v /Users/eligijus/Desktop/"SitYEA - Installer".dmg
+xcrun stapler staple -v /Users/eligijus/Desktop/"ChainHealth AI - Installer".dmg
 
 
 xcrun notarytool log ec687223-d29d-45d2-9b02-beac2beff1eb --keychain-profile "SitYEA"

@@ -16,7 +16,7 @@ const NotificationList = require("./notification-list");
 const sendMail = require("./mailer");
 const fsExists = promisify(fs.exists);
 const { unzipAssets, needsUnzip } = require("./unzip-assets");
-const { createWritableDirs, getTrueSettingsPath } = require("./writable-path-utils");
+const { createWritableDirs, getSettingPathMac, getMacPathModules, getTrueSettingsPath } = require("./writable-path-utils");
 const appVersion = require("./app-version");
 const Console = require("console");
 
@@ -150,8 +150,8 @@ async function initPostureEvaluator(win) {
         const ipcRS = await manProc.starRS({
             ipc: ipcPython,
             port: portPython,
-            pathRam: getTrueSettingsPath(PATH_RAM),
-            pathRam2: getTrueSettingsPath(PATH_RAM_2),
+            pathRam: getSettingPathMac(PATH_RAM),
+            pathRam2: getSettingPathMac(PATH_RAM_2),
             camera: manCfg.settings.camera,
             useSimple: isSimple
         });
@@ -195,7 +195,7 @@ async function initPostureEvaluator(win) {
 
         console.log("Received RS metadata.");
 
-        const fd = fs.openSync(getTrueSettingsPath(PATH_RAM_2), 'r+');
+        const fd = fs.openSync(getSettingPathMac(PATH_RAM_2), 'r+');
 
         console.log("Reading RAM file...");
 
@@ -221,9 +221,9 @@ async function initPostureEvaluator(win) {
             ipc: ipcPython,
             port: portPython,
             maxFrames: manCfg.settings.model.predictionFrames,
-            pathModel: getTrueSettingsPath(manCfg.settings.model.modelCompiled),
-            pathRam: getTrueSettingsPath(PATH_RAM),
-            pathRam2: getTrueSettingsPath(PATH_RAM_2),
+            pathModel: getSettingPathMac(manCfg.settings.model.modelMac),
+            pathRam: getSettingPathMac(PATH_RAM),
+            pathRam2: getSettingPathMac(PATH_RAM_2),
             width: rsDims.width,
             height: rsDims.height,
             depthScale,
